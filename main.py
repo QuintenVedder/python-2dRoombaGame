@@ -18,8 +18,14 @@ Clock = pg.time.Clock()
 FPS = 30
 timer = time.time()
 
+def get_current_file_path():
+    current_file = __file__
+    parent_directory = os.path.abspath(os.path.join(current_file, os.pardir))
+    parent_directory = parent_directory.replace('\\', '\\\\')
+    return parent_directory
 # images
-root_img_dir = "C:\\Users\\quint\\OneDrive - ROC Nova College\\Desktop\python\\roombagame\\pyhton-2dRoombaGame\\images\\"
+root_dir = get_current_file_path()
+root_img_dir = root_dir + "\\images\\"
 img_start_button = pg.image.load(root_img_dir + "\\start.png")
 img_start_button_pressed = pg.image.load(root_img_dir + "\\start_druk.png")
 
@@ -80,13 +86,14 @@ buttoncreditsY = (WINDOW_HEIGHT - buttonheight)
 
 
 def loadmap():
-    if os.path.exists("C:\\Users\\quint\\OneDrive - ROC Nova College\\Desktop\\python\\roombagame\\python-2dRoombaGame\\maps\\" + map_file_name + ".npy"):
-        return np.load("C:\\Users\\quint\\OneDrive - ROC Nova College\\Desktop\\python\\roombagame\\python-2dRoombaGame\\maps\\" + map_file_name + ".npy")
+    if os.path.exists(root_dir + "\\maps\\" + map_file_name + ".npy"):
+        return np.load(root_dir + "\\maps\\" + map_file_name + ".npy")
     else:
-        return np.load("C:\\Users\\quint\\OneDrive - ROC Nova College\\Desktop\python\\roombagame\\pyhton-2dRoombaGame\\maps\\testlvl.npy")
+        return np.load(root_dir + "\\maps\\testlvl.npy")
 
 
 activemap = loadmap()
+
 
 
 def drawgrid(start_point, activemap, player=None):
@@ -145,10 +152,10 @@ spawn_player = True
 title_height = 0
 title_down = False
 start = False
+instructions = False
 
 while mainmenu:
     Clock.tick(FPS)
-
     while runmapmaker:
         WINDOW.fill((black))
         mouse = pg.mouse.get_pos()
@@ -197,6 +204,11 @@ while mainmenu:
         if event.type == pg.QUIT:
             runplay = False
         pg.display.flip()
+
+    while instructions:
+        a = 1
+
+
 
     WINDOW.fill((white))
     WINDOW.blit(img_background, (0, 0))

@@ -1,7 +1,8 @@
 maps = [
     ['in MAPS you are able to make you own level by clicking the mouse buttons.'],
     ['left-click = build wall, right-click = delete wall, scrollwheel-click = starting point.'],
-    ['if more then 1 starting points are placed the roomba will choose the first one it bumps against.']  ,
+    ['if more then 1 starting points are placed the roomba will choose the first one it bumps against.'] ,
+    ['do not forget to place walls around the sides of your house otherwise the roomba might escape'] ,
     ['click the s key to save and the q key to quit,'],
     ['you may need to click a few times because the code written for this game sucks'] 
 ]
