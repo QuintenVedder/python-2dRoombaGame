@@ -6,7 +6,8 @@ import pygame as pg
 import os
 import sys
 from classes import Player, Block, Button
-import texts
+import instruction_texts as texts
+import credit_text
 sys.path.append('shootergame/maps/')
 pg.init()
 map_name = str(random.randint(0, 99999999999999))
@@ -28,20 +29,15 @@ grey = (200, 200, 200)
 WINDOW_HEIGHT = 500
 WINDOW_WIDTH = 1000
 WINDOW = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-font = pg.font.Font('freesansbold.ttf', 35)
+font = pg.font.Font(None, 30)
 pg.display.set_caption('OH YEAHHH!!')
-
-instruction_texts_array = [
-    [texts.play,"play.png"],
-    [texts.maps,"maps.png"],
-    [texts.quit,"quit.png"],
-    ]
 
 def get_current_file_path():
     current_file = __file__
     parent_directory = os.path.abspath(os.path.join(current_file, os.pardir))
     parent_directory = parent_directory.replace('\\', '\\\\')
     return parent_directory
+
 # images
 root_dir = get_current_file_path()
 root_img_dir = root_dir + "\\images\\"
@@ -96,7 +92,7 @@ buttoncreditsX = (0)
 buttoncreditsY = (WINDOW_HEIGHT - buttonheight)
 
 instructions_title_posX = (WINDOW_WIDTH - buttonwidth)/2
-instructions_title_posy = ((WINDOW_HEIGHT + 50) - buttonheight)/2
+instructions_title_posY = 0
 
 instructions_arrowleft_posX = 0
 instructions_arrowrigth_posX = (WINDOW_WIDTH - arrowbuttonwidth)
@@ -115,6 +111,14 @@ arrow_rightButton = Button(img_rightarrow_button, img_rightarrow_button_pressed,
 arrows = [arrow_leftButton, arrow_rightButton]
 buttons = [quitButton, mapmakingButton, playButton, instructionsButton, creditsButton]
 
+
+instruction_texts_array = [
+    [texts.play,img_play_button],
+    [texts.maps,img_maps_button],
+    [texts.quit,img_quit_button],
+    ]
+
+credits_text = credit_text.credits
 
 def loadmap():
     if os.path.exists(root_dir + "\\maps\\" + map_file_name + ".npy"):
@@ -152,6 +156,7 @@ def drawgrid(start_point, activemap, player=None):
 
 def drawgridmaker(mx, my):
     blocksize = 50
+    mouse_buttons = pg.mouse.get_pressed()
     for row in range(len(activemap)):
         for col in range(len(activemap[row])):
             x = col * blocksize
@@ -159,14 +164,12 @@ def drawgridmaker(mx, my):
             rect = pg.Rect(x, y, blocksize, blocksize)
             if mx > x and mx < (x+blocksize) and my > y and my < (y+blocksize):
                 pg.draw.rect(WINDOW, red, rect)
-                for event in pg.event.get():
-                    if event.type == pg.MOUSEBUTTONDOWN:
-                        if event.button == 1:
-                            activemap[row][col] = 1
-                        if event.button == 2:
-                            activemap[row][col] = 2
-                        if event.button == 3:
-                            activemap[row][col] = 0
+                if mouse_buttons[0]:
+                    activemap[row][col] = 1
+                if mouse_buttons[1]:
+                    activemap[row][col] = 2
+                if mouse_buttons[2]:
+                    activemap[row][col] = 0
 
             elif activemap[row][col] == 2:
                 pg.draw.rect(WINDOW, green, rect)
@@ -174,6 +177,35 @@ def drawgridmaker(mx, my):
                 pg.draw.rect(WINDOW, white, rect)
             elif activemap[row][col] == 0:
                 pg.draw.rect(WINDOW, white, rect, 1)
+
+# these 2 functions render the texts,
+# dont ask me how because it costs me to much of my own sanity to figure out
+def flatten_text(text):
+    flattened_text = []
+
+    for item in text:
+        if isinstance(item, list):
+            flattened_text.extend(flatten_text(item))
+        else:
+            flattened_text.append(item)
+
+    return flattened_text
+
+
+def render_texts(text, text_posX, text_posY, word_spacing):
+    text_posY_current = text_posY  # keep track of current y position
+    for line in text:
+        words = line.split()  # split line into separate words
+        text_posX_current = text_posX  # reset x position for each line
+        for word in words:
+            text_surface = font.render(word, True, (255, 255, 255))
+            text_rect = text_surface.get_rect()
+            text_rect.x = text_posX_current
+            text_rect.y = text_posY_current
+            WINDOW.blit(text_surface, text_rect)
+            text_posX_current += text_rect.width + word_spacing  # add word width and spacing to x position
+        text_posY_current += text_rect.height  # add line height to y position
+
 
 
 runmapmaker = False
@@ -186,21 +218,27 @@ start = False
 instructions = False
 credits = False
 current_text = 0
+text_posX = 75
+text_posY = 200
+word_spacing = 7
 
 while mainmenu:
     Clock.tick(FPS)
     while runmapmaker:
+        keys = pg.key.get_pressed()
         WINDOW.fill((black))
         mouse = pg.mouse.get_pos()
         drawgridmaker(mouse[0], mouse[1])
 
         for event in pg.event.get():
             if event.type == pg.KEYDOWN:
-                if event.key == pg.K_s:
-                    np.save("shootergame/maps/" + map_file_name, activemap)
-                if event.key == pg.K_q:
-                    mainmenu = True
-                    runmapmaker = False
+                a=1
+
+        if keys[pg.K_s]:
+            np.save("shootergame/maps/" + map_file_name, activemap)
+        if keys[pg.K_q]:
+            mainmenu = True
+            runmapmaker = False
 
         if event.type == pg.QUIT:
             runmapmaker = False
@@ -248,7 +286,6 @@ while mainmenu:
                 pg.quit()
 
             if event.type == pg.MOUSEBUTTONDOWN:
-                #clicking arrow buttons
                 if arrow_rightButton.handle_collision():
                     if current_text == len(instruction_texts_array)-1:
                         current_text = 0
@@ -260,7 +297,9 @@ while mainmenu:
                         current_text = len(instruction_texts_array)-1
                     else:
                         current_text-=1
-
+        flattened_texts = flatten_text(instruction_texts_array[current_text][0])
+        render_texts(flattened_texts, text_posX, text_posY, word_spacing)
+        WINDOW.blit(instruction_texts_array[current_text][1], (instructions_title_posX, instructions_title_posY))
         for arrow in arrows:
             arrow.handle_collision()
             arrow.draw()
@@ -270,6 +309,24 @@ while mainmenu:
             instructions = False
 
         pg.display.flip()
+
+    while credits:
+        WINDOW.blit(img_background, (0, 0))
+        keys = pg.key.get_pressed()
+        for event in pg.event.get():
+    
+            if event.type == pg.QUIT:
+                pg.quit()
+
+        flattened_texts = flatten_text(credits_text)
+        render_texts(flattened_texts, text_posX, text_posY-100, word_spacing)
+
+        if keys[pg.K_q]:
+            mainmenu = True
+            credits = False
+
+        pg.display.flip()
+
 
 
 
@@ -289,7 +346,7 @@ while mainmenu:
 
         if event.type == pg.QUIT:
                 pg.quit()
-                
+
         if event.type == pg.MOUSEBUTTONDOWN:
             
             if quitButton.handle_collision() and start:
