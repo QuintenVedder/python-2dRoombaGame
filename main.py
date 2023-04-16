@@ -5,7 +5,8 @@ import maps
 import pygame as pg
 import os
 import sys
-from classes import Player, Block
+from classes import Player, Block, Button
+import texts
 sys.path.append('shootergame/maps/')
 pg.init()
 map_name = str(random.randint(0, 99999999999999))
@@ -17,6 +18,24 @@ speed = 1
 Clock = pg.time.Clock()
 FPS = 30
 timer = time.time()
+
+black = (0, 0, 0)
+aplha_black = (0, 0, 0, 50)
+white = (255, 255, 255)
+red = (255, 0, 0)
+green = (0, 255, 0)
+grey = (200, 200, 200)
+WINDOW_HEIGHT = 500
+WINDOW_WIDTH = 1000
+WINDOW = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+font = pg.font.Font('freesansbold.ttf', 35)
+pg.display.set_caption('OH YEAHHH!!')
+
+instruction_texts_array = [
+    [texts.play,"play.png"],
+    [texts.maps,"maps.png"],
+    [texts.quit,"quit.png"],
+    ]
 
 def get_current_file_path():
     current_file = __file__
@@ -42,33 +61,25 @@ img_leftarrow_button = pg.image.load(root_img_dir + "\\left.png")
 img_leftarrow_button_pressed = pg.image.load(root_img_dir + "\\left_druk.png")
 
 img_rightarrow_button = pg.image.load(root_img_dir + "\\right.png")
-img_rightarrow_button_pressed = pg.image.load(
-    root_img_dir + "\\right_druk.png")
+img_rightarrow_button_pressed = pg.image.load(root_img_dir + "\\right_druk.png")
 
 img_credits_button = pg.image.load(root_img_dir + "\\credits.png")
 img_credits_button_pressed = pg.image.load(root_img_dir + "\\credits_druk.png")
 
 img_instructions_button = pg.image.load(root_img_dir + "\\instructions.png")
-img_instructions_button_pressed = pg.image.load(
-    root_img_dir + "\\instructions_druk.png")
+img_instructions_button_pressed = pg.image.load(root_img_dir + "\\instructions_druk.png")
 
 img_background = pg.image.load(root_img_dir + "\\menu_achtergrond.png")
 img_title = pg.image.load(root_img_dir + "\\titel.png")
+img_icon = pg.image.load(root_img_dir + "icon.png")
+pg.display.set_icon(img_icon)
 
-
-black = (0, 0, 0)
-aplha_black = (0, 0, 0, 50)
-white = (255, 255, 255)
-red = (255, 0, 0)
-green = (0, 255, 0)
-grey = (200, 200, 200)
-WINDOW_HEIGHT = 500
-WINDOW_WIDTH = 1000
-WINDOW = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-font = pg.font.Font('freesansbold.ttf', 35)
 # button variables
 buttonwidth = 150
 buttonheight = 50
+arrowbuttonwidth = 50
+arrowbuttonheight = 150
+
 buttonquitposX = (WINDOW_WIDTH - buttonwidth)/2
 buttonquitposY = ((WINDOW_HEIGHT + 200) - buttonheight)/2
 
@@ -83,6 +94,26 @@ buttoninstructionsY = (WINDOW_HEIGHT - buttonheight)
 
 buttoncreditsX = (0)
 buttoncreditsY = (WINDOW_HEIGHT - buttonheight)
+
+instructions_title_posX = (WINDOW_WIDTH - buttonwidth)/2
+instructions_title_posy = ((WINDOW_HEIGHT + 50) - buttonheight)/2
+
+instructions_arrowleft_posX = 0
+instructions_arrowrigth_posX = (WINDOW_WIDTH - arrowbuttonwidth)
+instructions_arrows_posY = (WINDOW_HEIGHT - arrowbuttonheight)/2
+#making buttons
+quitButton = Button(img_quit_button, img_quit_button_pressed, buttonquitposX, buttonquitposY, buttonwidth, buttonheight, WINDOW)
+mapmakingButton = Button(img_maps_button, img_maps_button_pressed, buttonmapmakingposX, buttonmapmakingposY, buttonwidth, buttonheight, WINDOW)
+mapmakingButton = Button(img_maps_button, img_maps_button_pressed, buttonmapmakingposX, buttonmapmakingposY, buttonwidth, buttonheight, WINDOW)
+playButton = Button(img_play_button, img_play_button_pressed, buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
+startButton = Button(img_start_button, img_start_button_pressed, buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
+instructionsButton = Button(img_instructions_button, img_instructions_button_pressed, buttoninstructionsX, buttoninstructionsY, buttonwidth, buttonheight, WINDOW)
+creditsButton = Button(img_credits_button, img_credits_button_pressed, buttoncreditsX, buttoncreditsY, buttonwidth, buttonheight, WINDOW)
+arrow_leftButton = Button(img_leftarrow_button, img_leftarrow_button_pressed, instructions_arrowleft_posX, instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
+arrow_rightButton = Button(img_rightarrow_button, img_rightarrow_button_pressed, instructions_arrowrigth_posX, instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
+
+arrows = [arrow_leftButton, arrow_rightButton]
+buttons = [quitButton, mapmakingButton, playButton, instructionsButton, creditsButton]
 
 
 def loadmap():
@@ -153,6 +184,8 @@ title_height = 0
 title_down = False
 start = False
 instructions = False
+credits = False
+current_text = 0
 
 while mainmenu:
     Clock.tick(FPS)
@@ -181,8 +214,7 @@ while mainmenu:
         WINDOW.blit(img_background, (0, 0))
         keys = pg.key.get_pressed()
         if spawn_player and start_point != (0, 0):
-            player = Player(
-                "player", start_point[0], start_point[1], player_radius, player_color, WINDOW)
+            player = Player("player", start_point[0], start_point[1], player_radius, player_color, WINDOW)
             spawn_player = False
 
         if spawn_player == False:
@@ -206,7 +238,38 @@ while mainmenu:
         pg.display.flip()
 
     while instructions:
-        a = 1
+        WINDOW.blit(img_background, (0, 0))
+        mouse = pg.mouse.get_pos()
+        keys = pg.key.get_pressed()
+
+        for event in pg.event.get():
+
+            if event.type == pg.QUIT:
+                pg.quit()
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+                #clicking arrow buttons
+                if arrow_rightButton.handle_collision():
+                    if current_text == len(instruction_texts_array)-1:
+                        current_text = 0
+                    else:
+                        current_text+=1
+
+                if arrow_leftButton.handle_collision():
+                    if current_text == 0:
+                        current_text = len(instruction_texts_array)-1
+                    else:
+                        current_text-=1
+
+        for arrow in arrows:
+            arrow.handle_collision()
+            arrow.draw()
+
+        if keys[pg.K_q] or event.type == pg.QUIT:
+            mainmenu = True
+            instructions = False
+
+        pg.display.flip()
 
 
 
@@ -223,78 +286,39 @@ while mainmenu:
     WINDOW.blit(img_title, (210, title_height))
 
     for event in pg.event.get():
+
+        if event.type == pg.QUIT:
+                pg.quit()
+                
         if event.type == pg.MOUSEBUTTONDOWN:
-            if buttonquitposX <= mouse[0] <= buttonquitposX+buttonwidth and buttonquitposY <= mouse[1] <= buttonquitposY+buttonheight:
+            
+            if quitButton.handle_collision() and start:
                 pg.quit()
 
-            if buttonmapmakingposX <= mouse[0] <= buttonmapmakingposX+buttonwidth and buttonmapmakingposY <= mouse[1] <= buttonmapmakingposY+buttonheight:
+            if mapmakingButton.handle_collision() and start:
                 runmapmaker = True
 
-            if buttonplayX <= mouse[0] <= buttonplayX+buttonwidth and buttonplayY <= mouse[1] <= buttonplayY+buttonheight:
-                if start:
-                    runplay = True
-                else:
-                    start = True
+            if playButton.handle_collision() and start:
+                runplay = True
+
+            if startButton.handle_collision():
+                start = True
+
+            if instructionsButton.handle_collision() and start:
+                instructions = True
+
+            if creditsButton.handle_collision() and start:
+                credits = True
+
+    if start == False:
+        startButton.handle_collision()
+        startButton.draw()
+    if start:
+        for button in buttons:
+            button.handle_collision()
+            button.draw()
 
     mouse = pg.mouse.get_pos()
-#  quit button
-    if buttonquitposX <= mouse[0] <= buttonquitposX+buttonwidth and buttonquitposY <= mouse[1] <= buttonquitposY+buttonheight:
-        if start:
-            WINDOW.blit(img_quit_button_pressed,
-                        (buttonquitposX, buttonquitposY))
-
-    else:
-        if start:
-            WINDOW.blit(img_quit_button, (buttonquitposX, buttonquitposY))
-
-#  map making button
-    if buttonmapmakingposX <= mouse[0] <= buttonmapmakingposX+buttonwidth and buttonmapmakingposY <= mouse[1] <= buttonmapmakingposY+buttonheight:
-        if start:
-            WINDOW.blit(img_maps_button_pressed,
-                        (buttonmapmakingposX, buttonmapmakingposY))
-
-    else:
-        if start:
-            WINDOW.blit(img_maps_button,
-                        (buttonmapmakingposX, buttonmapmakingposY))
-
-#  play button
-    if buttonplayX <= mouse[0] <= buttonplayX+buttonwidth and buttonplayY <= mouse[1] <= buttonplayY+buttonheight:
-        if start:
-            WINDOW.blit(img_play_button_pressed, (buttonplayX, buttonplayY))
-        else:
-            WINDOW.blit(img_start_button_pressed, (buttonplayX, buttonplayY))
-
-    else:
-        if start:
-            WINDOW.blit(img_play_button, (buttonplayX, buttonplayY))
-        else:
-            WINDOW.blit(img_start_button, (buttonplayX, buttonplayY))
-
-# instruction button
-    if buttoninstructionsX <= mouse[0] <= buttoninstructionsX+buttonwidth and buttoninstructionsY <= mouse[1] <= buttoninstructionsY+buttonheight:
-        if start:
-            WINDOW.blit(img_instructions_button_pressed,
-                        (buttoninstructionsX, buttoninstructionsY))
-
-    else:
-        if start:
-            WINDOW.blit(img_instructions_button,
-                        (buttoninstructionsX, buttoninstructionsY))
-
-
-# credits button
-    if buttoncreditsX <= mouse[0] <= buttoncreditsX+buttonwidth and buttoncreditsY <= mouse[1] <= buttoncreditsY+buttonheight:
-        if start:
-            WINDOW.blit(img_credits_button_pressed,
-                        (buttoncreditsX, buttoncreditsY))
-
-    else:
-        if start:
-            WINDOW.blit(img_credits_button, (buttoncreditsX, buttoncreditsY))
-
-    if event.type == pg.QUIT:
-        mainmenu = False
 
     # end event handling
     pg.display.flip()

@@ -16,10 +16,6 @@ class Player:
     def draw(self):
         pg.draw.circle(self.WINDOW, self.color, (self.x, self.y), self.radius)
 
-    
-    def collides_with(self, rect):
-        return self.rect.colliderect(rect)
-
     def handle_collision(player, block):
 
         closest_x = max(block.left, min(player.x, block.right))
@@ -52,3 +48,29 @@ class Block:
 
     def draw(self,color):
         pg.draw.rect(self.WINDOW, color, self.rect)
+
+class Button:
+    def __init__(self, image, pressed_image, x, y, width, height,WINDOW):
+        self.hover = False
+        self.image = image
+        self.pressed_image = pressed_image
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.WINDOW = WINDOW
+
+    def draw(self):
+        if self.hover:
+            self.WINDOW.blit(self.pressed_image, (self.x, self.y))
+        else:
+            self.WINDOW.blit(self.image, (self.x, self.y))
+
+    def handle_collision(self):
+        mouse = pg.mouse.get_pos()
+        if self.x <= mouse[0] <= self.x+self.width and self.y <= mouse[1] <= self.y+self.height:
+            self.hover = True
+            return True
+        else:
+            self.hover = False
+            return False
