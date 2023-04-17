@@ -1,20 +1,34 @@
 import pygame as pg
 import math
 class Player:
-    def __init__(self, name, x, y, radius, color,WINDOW):
+    def __init__(self, name, x, y, radius, color, WINDOW, player_images):
         self.name = name
         self.x = x
         self.y = y
         self.radius = radius
         self.color = color
         self.WINDOW = WINDOW
+        self.images = player_images
+        self.facing = self.images[0] # *still, *up, up-right, up-left, *down, down-right, down-left, *left, *right
 
     def move(self, dx, dy):
+        if dx == 0 and dy == 0:
+            self.facing = self.facing
+        elif dx > 0:
+            self.facing = self.images[3]
+        elif dx < 0:
+            self.facing = self.images[2]
+        elif dy > 0:
+            self.facing = self.images[1]
+        elif dy < 0:
+            self.facing = self.images[0]
+
         self.x += dx
         self.y += dy
 
     def draw(self):
-        pg.draw.circle(self.WINDOW, self.color, (self.x, self.y), self.radius)
+        #pg.draw.circle(self.WINDOW, self.color, (self.x, self.y), self.radius)
+        self.WINDOW.blit(self.facing, (self.x - (self.radius), self.y - (self.radius)))
 
     def handle_collision(player, block):
 
@@ -74,3 +88,26 @@ class Button:
         else:
             self.hover = False
             return False
+        
+class Battery:
+    def __init__(self, x, y,WINDOW, battery_images):
+        self.x = x
+        self.y = y
+        self.WINDOW = WINDOW
+        self.images = battery_images
+        self.active_image = self.images[0]
+
+    def battery_life(self, battery_life):
+        if battery_life == 1:
+            self.facing = self.images[0]
+        elif battery_life == 2:
+            self.facing = self.images[1]
+        elif battery_life == 3:
+            self.facing = self.images[2]
+        elif battery_life == 4:
+            self.facing = self.images[3]
+        elif battery_life == 5:
+            self.facing = self.images[4]
+
+    def draw(self):
+        self.WINDOW.blit(self.facing, (self.x, self.y))

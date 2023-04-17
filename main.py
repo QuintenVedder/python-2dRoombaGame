@@ -5,7 +5,7 @@ import maps
 import pygame as pg
 import os
 import sys
-from classes import Player, Block, Button
+from classes import Player, Block, Button, Battery
 import instruction_texts as texts
 import credit_text
 sys.path.append('shootergame/maps/')
@@ -13,8 +13,11 @@ pg.init()
 map_name = str(random.randint(0, 99999999999999))
 map_file_name = "{}".format(map_name)
 start_point = (0, 0)
-player_radius = 15
+player_radius = 25
 player_color = (255, 0, 0)
+batteryX = 900
+batteryY = 400
+battery_life = 1
 speed = 1
 Clock = pg.time.Clock()
 FPS = 30
@@ -41,6 +44,20 @@ def get_current_file_path():
 # images
 root_dir = get_current_file_path()
 root_img_dir = root_dir + "\\images\\"
+#player movement images. i know the variable names suck, deal with it!
+down = pg.image.load(root_img_dir + "\\redroomba_down.png")
+left = pg.image.load(root_img_dir + "\\redroomba_left.png")
+right = pg.image.load(root_img_dir + "\\redroomba_right.png")
+up = pg.image.load(root_img_dir + "\\redroomba_up.png")
+
+#battery images img-1 is full and 5 empty 
+img_battery_1 = pg.image.load(root_img_dir + "\\battery_1.png")
+img_battery_2 = pg.image.load(root_img_dir + "\\battery_2.png")
+img_battery_3 = pg.image.load(root_img_dir + "\\battery_3.png")
+img_battery_4 = pg.image.load(root_img_dir + "\\battery_4.png")
+img_battery_5 = pg.image.load(root_img_dir + "\\battery_5.png")
+
+#button images
 img_start_button = pg.image.load(root_img_dir + "\\start.png")
 img_start_button_pressed = pg.image.load(root_img_dir + "\\start_druk.png")
 
@@ -108,8 +125,12 @@ creditsButton = Button(img_credits_button, img_credits_button_pressed, buttoncre
 arrow_leftButton = Button(img_leftarrow_button, img_leftarrow_button_pressed, instructions_arrowleft_posX, instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
 arrow_rightButton = Button(img_rightarrow_button, img_rightarrow_button_pressed, instructions_arrowrigth_posX, instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
 
+# lists for things ;)
 arrows = [arrow_leftButton, arrow_rightButton]
 buttons = [quitButton, mapmakingButton, playButton, instructionsButton, creditsButton]
+player_images = [up, down, left, right]
+battery_images = [img_battery_1, img_battery_2, img_battery_3, img_battery_4, img_battery_5]
+trash_pos = []
 
 
 instruction_texts_array = [
@@ -144,13 +165,14 @@ def drawgrid(start_point, activemap, player=None):
                 if player is not None:
                     player.handle_collision(block)
                 block.draw(black)
-                block_alphasurface = pg.Surface(
-                    (blocksize, blocksize), pg.SRCALPHA)
-                pg.draw.rect(block_alphasurface, aplha_black,
-                             block_alphasurface.get_rect())
+                block_alphasurface = pg.Surface((blocksize, blocksize), pg.SRCALPHA)
+                pg.draw.rect(block_alphasurface, aplha_black, block_alphasurface.get_rect())
                 WINDOW.blit(block_alphasurface, (x, y+25))
+
             if array[row][col] == 2 and start_point == (0, 0):
                 start_point = (x-(blocksize/2)+50, y-(blocksize/2)+50)
+            if array[row][col] == 0:
+                pos = (x, y)
     return start_point
 
 
@@ -221,6 +243,7 @@ current_text = 0
 text_posX = 75
 text_posY = 200
 word_spacing = 7
+start_battery = False
 
 while mainmenu:
     Clock.tick(FPS)
@@ -252,18 +275,34 @@ while mainmenu:
         WINDOW.blit(img_background, (0, 0))
         keys = pg.key.get_pressed()
         if spawn_player and start_point != (0, 0):
-            player = Player("player", start_point[0], start_point[1], player_radius, player_color, WINDOW)
+            player = Player("player", start_point[0], start_point[1], player_radius, player_color, WINDOW, player_images)
+            battery = Battery(batteryX, batteryY,WINDOW, battery_images)
             spawn_player = False
+            battery_life = 1
+            battery_timer = time.time()
+            start_battery = True
 
         if spawn_player == False:
             start_point = drawgrid(start_point, activemap, player)
-            player.move((keys[pg.K_RIGHT] - keys[pg.K_LEFT]) *
-                        speed, (keys[pg.K_DOWN] - keys[pg.K_UP]) * speed)
+            if battery_life < 5:
+                player.move((keys[pg.K_RIGHT] - keys[pg.K_LEFT]) * speed, (keys[pg.K_DOWN] - keys[pg.K_UP]) * speed)
+            else: 
+                battery_timer = time.time()
             player.draw()
         else:
             start_point = drawgrid(start_point, activemap)
 
+        if start_battery == True and time.time() - battery_timer > 5:
+            battery_life += 1
+            battery_timer = time.time()
+            
+        if start_battery:
+            battery.battery_life(battery_life)
+            battery.draw()
+
         if keys[pg.K_q]:
+            battery_timer = time.time()
+            battery_life = 1
             mainmenu = True
             runplay = False
 
@@ -272,7 +311,7 @@ while mainmenu:
                 a = 1
 
         if event.type == pg.QUIT:
-            runplay = False
+            pg.quit()
         pg.display.flip()
 
     while instructions:
