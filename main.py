@@ -45,10 +45,14 @@ def get_current_file_path():
 root_dir = get_current_file_path()
 root_img_dir = root_dir + "\\images\\"
 #player movement images. i know the variable names suck, deal with it!
-down = pg.image.load(root_img_dir + "\\redroomba_down.png")
-left = pg.image.load(root_img_dir + "\\redroomba_left.png")
-right = pg.image.load(root_img_dir + "\\redroomba_right.png")
-up = pg.image.load(root_img_dir + "\\redroomba_up.png")
+off_down = pg.image.load(root_img_dir + "\\redroomba_down.png")
+off_left = pg.image.load(root_img_dir + "\\redroomba_left.png")
+off_right = pg.image.load(root_img_dir + "\\redroomba_right.png")
+off_up = pg.image.load(root_img_dir + "\\redroomba_up.png")
+on_down = pg.image.load(root_img_dir + "\\roomba_down.png")
+on_left = pg.image.load(root_img_dir + "\\roomba_left.png")
+on_right = pg.image.load(root_img_dir + "\\roomba_right.png")
+on_up = pg.image.load(root_img_dir + "\\roomba_up.png")
 
 #battery images img-1 is full and 5 empty 
 img_battery_1 = pg.image.load(root_img_dir + "\\battery_1.png")
@@ -128,7 +132,9 @@ arrow_rightButton = Button(img_rightarrow_button, img_rightarrow_button_pressed,
 # lists for things ;)
 arrows = [arrow_leftButton, arrow_rightButton]
 buttons = [quitButton, mapmakingButton, playButton, instructionsButton, creditsButton]
-player_images = [up, down, left, right]
+player_images_on = [on_up, on_down, on_left, on_right]
+player_images_off = [off_up, off_down, off_left, off_right]
+player_images = player_images_on
 battery_images = [img_battery_1, img_battery_2, img_battery_3, img_battery_4, img_battery_5]
 trash_pos = []
 
@@ -275,7 +281,7 @@ while mainmenu:
         WINDOW.blit(img_background, (0, 0))
         keys = pg.key.get_pressed()
         if spawn_player and start_point != (0, 0):
-            player = Player("player", start_point[0], start_point[1], player_radius, player_color, WINDOW, player_images)
+            player = Player("player", start_point[0], start_point[1], player_radius, player_color, WINDOW, player_images_on, player_images_off, player_images)
             battery = Battery(batteryX, batteryY,WINDOW, battery_images)
             spawn_player = False
             battery_life = 1

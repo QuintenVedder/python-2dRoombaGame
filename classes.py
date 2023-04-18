@@ -1,15 +1,17 @@
 import pygame as pg
 import math
 class Player:
-    def __init__(self, name, x, y, radius, color, WINDOW, player_images):
+    def __init__(self, name, x, y, radius, color, WINDOW, player_images_off, player_images_on, player_images):
         self.name = name
         self.x = x
         self.y = y
         self.radius = radius
         self.color = color
-        self.WINDOW = WINDOW
+        self.WINDOW = WINDOW 
+        self.images_off = player_images_off
+        self.images_on = player_images_on      
         self.images = player_images
-        self.facing = self.images[0] # *still, *up, up-right, up-left, *down, down-right, down-left, *left, *right
+        self.facing = self.images[0]  
 
     def move(self, dx, dy):
         if dx == 0 and dy == 0:
@@ -27,7 +29,6 @@ class Player:
         self.y += dy
 
     def draw(self):
-        #pg.draw.circle(self.WINDOW, self.color, (self.x, self.y), self.radius)
         self.WINDOW.blit(self.facing, (self.x - (self.radius), self.y - (self.radius)))
 
     def handle_collision(player, block):
