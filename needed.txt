@@ -1,8 +1,0 @@
-functions for making gris maps and implementing them:
-grid map pygame
-class for block/wall
-func from array to maps
-func map to array
-
-
-main menu loop
