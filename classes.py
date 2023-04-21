@@ -1,7 +1,7 @@
 import pygame as pg
 import math
 class Player:
-    def __init__(self, name, x, y, radius, color, WINDOW, player_images_off, player_images_on, player_images):
+    def __init__(self, name, x, y, radius, color, WINDOW, player_images_off, player_images_on):
         self.name = name
         self.x = x
         self.y = y
@@ -10,26 +10,44 @@ class Player:
         self.WINDOW = WINDOW 
         self.images_off = player_images_off
         self.images_on = player_images_on      
-        self.images = player_images
+        self.images = self.images_on
         self.facing = self.images[0]  
+        self.currently_facing = None
 
     def move(self, dx, dy):
+
         if dx == 0 and dy == 0:
             self.facing = self.facing
         elif dx > 0:
             self.facing = self.images[3]
+            self.currently_facing = "right"
         elif dx < 0:
             self.facing = self.images[2]
+            self.currently_facing = "left"
         elif dy > 0:
             self.facing = self.images[1]
+            self.currently_facing = "down"
         elif dy < 0:
             self.facing = self.images[0]
+            self.currently_facing = "up"
 
         self.x += dx
         self.y += dy
 
     def draw(self):
         self.WINDOW.blit(self.facing, (self.x - (self.radius), self.y - (self.radius)))
+
+    def change_color(self):
+        self.images = self.images_off
+        self.facing = self.images[0]
+        if self.currently_facing == "right":
+            self.facing = self.images[3]
+        elif self.currently_facing == "left":
+            self.facing = self.images[2]
+        elif self.currently_facing == "down":
+            self.facing = self.images[1]
+        elif self.currently_facing == "up":
+            self.facing = self.images[0]
 
     def handle_collision(player, block):
 

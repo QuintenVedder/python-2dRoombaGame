@@ -250,6 +250,7 @@ text_posX = 75
 text_posY = 200
 word_spacing = 7
 start_battery = False
+turn_player_off = True
 
 while mainmenu:
     Clock.tick(FPS)
@@ -281,7 +282,7 @@ while mainmenu:
         WINDOW.blit(img_background, (0, 0))
         keys = pg.key.get_pressed()
         if spawn_player and start_point != (0, 0):
-            player = Player("player", start_point[0], start_point[1], player_radius, player_color, WINDOW, player_images_on, player_images_off, player_images)
+            player = Player("player", start_point[0], start_point[1], player_radius, player_color, WINDOW, player_images_off, player_images_on)
             battery = Battery(batteryX, batteryY,WINDOW, battery_images)
             spawn_player = False
             battery_life = 1
@@ -293,6 +294,10 @@ while mainmenu:
             if battery_life < 5:
                 player.move((keys[pg.K_RIGHT] - keys[pg.K_LEFT]) * speed, (keys[pg.K_DOWN] - keys[pg.K_UP]) * speed)
             else: 
+                if turn_player_off:
+                    player.change_color()
+                    player.draw()
+                    turn_player_off = False
                 battery_timer = time.time()
             player.draw()
         else:
