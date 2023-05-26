@@ -8,6 +8,8 @@ import sys
 from classes import Player, Block, Button, Battery
 import instruction_texts as texts
 import credit_text
+
+
 sys.path.append('shootergame/maps/')
 pg.init()
 map_name = str(random.randint(0, 99999999999999))
@@ -38,56 +40,56 @@ pg.display.set_caption('OH YEAHHH!!')
 def get_current_file_path():
     current_file = __file__
     parent_directory = os.path.abspath(os.path.join(current_file, os.pardir))
-    parent_directory = parent_directory.replace('\\', '\\\\')
+    parent_directory = parent_directory.replace(os.path.sep, '/')
     return parent_directory
 
 # images
 root_dir = get_current_file_path()
-root_img_dir = root_dir + "\\images\\"
+root_img_dir = root_dir + "/images/"
 #player movement images. i know the variable names suck, deal with it!
-off_down = pg.image.load(root_img_dir + "\\redroomba_down.png")
-off_left = pg.image.load(root_img_dir + "\\redroomba_left.png")
-off_right = pg.image.load(root_img_dir + "\\redroomba_right.png")
-off_up = pg.image.load(root_img_dir + "\\redroomba_up.png")
-on_down = pg.image.load(root_img_dir + "\\roomba_down.png")
-on_left = pg.image.load(root_img_dir + "\\roomba_left.png")
-on_right = pg.image.load(root_img_dir + "\\roomba_right.png")
-on_up = pg.image.load(root_img_dir + "\\roomba_up.png")
+off_down = pg.image.load(root_img_dir + "redroomba_down.png")
+off_left = pg.image.load(root_img_dir + "redroomba_left.png")
+off_right = pg.image.load(root_img_dir + "redroomba_right.png")
+off_up = pg.image.load(root_img_dir + "redroomba_up.png")
+on_down = pg.image.load(root_img_dir + "roomba_down.png")
+on_left = pg.image.load(root_img_dir + "roomba_left.png")
+on_right = pg.image.load(root_img_dir + "roomba_right.png")
+on_up = pg.image.load(root_img_dir + "roomba_up.png")
 
 #battery images img-1 is full and 5 empty 
-img_battery_1 = pg.image.load(root_img_dir + "\\battery_1.png")
-img_battery_2 = pg.image.load(root_img_dir + "\\battery_2.png")
-img_battery_3 = pg.image.load(root_img_dir + "\\battery_3.png")
-img_battery_4 = pg.image.load(root_img_dir + "\\battery_4.png")
-img_battery_5 = pg.image.load(root_img_dir + "\\battery_5.png")
+img_battery_1 = pg.image.load(root_img_dir + "battery_1.png")
+img_battery_2 = pg.image.load(root_img_dir + "battery_2.png")
+img_battery_3 = pg.image.load(root_img_dir + "battery_3.png")
+img_battery_4 = pg.image.load(root_img_dir + "battery_4.png")
+img_battery_5 = pg.image.load(root_img_dir + "battery_5.png")
 
 #button images
-img_start_button = pg.image.load(root_img_dir + "\\start.png")
-img_start_button_pressed = pg.image.load(root_img_dir + "\\start_druk.png")
+img_start_button = pg.image.load(root_img_dir + "start.png")
+img_start_button_pressed = pg.image.load(root_img_dir + "start_druk.png")
 
-img_maps_button = pg.image.load(root_img_dir + "\\maps.png")
-img_maps_button_pressed = pg.image.load(root_img_dir + "\\maps_druk.png")
+img_maps_button = pg.image.load(root_img_dir + "maps.png")
+img_maps_button_pressed = pg.image.load(root_img_dir + "maps_druk.png")
 
-img_quit_button = pg.image.load(root_img_dir + "\\quit.png")
-img_quit_button_pressed = pg.image.load(root_img_dir + "\\quit_druk.png")
+img_quit_button = pg.image.load(root_img_dir + "quit.png")
+img_quit_button_pressed = pg.image.load(root_img_dir + "quit_druk.png")
 
-img_play_button = pg.image.load(root_img_dir + "\\play.png")
-img_play_button_pressed = pg.image.load(root_img_dir + "\\play_druk.png")
+img_play_button = pg.image.load(root_img_dir + "play.png")
+img_play_button_pressed = pg.image.load(root_img_dir + "play_druk.png")
 
-img_leftarrow_button = pg.image.load(root_img_dir + "\\left.png")
-img_leftarrow_button_pressed = pg.image.load(root_img_dir + "\\left_druk.png")
+img_leftarrow_button = pg.image.load(root_img_dir + "left.png")
+img_leftarrow_button_pressed = pg.image.load(root_img_dir + "left_druk.png")
 
-img_rightarrow_button = pg.image.load(root_img_dir + "\\right.png")
-img_rightarrow_button_pressed = pg.image.load(root_img_dir + "\\right_druk.png")
+img_rightarrow_button = pg.image.load(root_img_dir + "right.png")
+img_rightarrow_button_pressed = pg.image.load(root_img_dir + "right_druk.png")
 
-img_credits_button = pg.image.load(root_img_dir + "\\credits.png")
-img_credits_button_pressed = pg.image.load(root_img_dir + "\\credits_druk.png")
+img_credits_button = pg.image.load(root_img_dir + "credits.png")
+img_credits_button_pressed = pg.image.load(root_img_dir + "credits_druk.png")
 
-img_instructions_button = pg.image.load(root_img_dir + "\\instructions.png")
-img_instructions_button_pressed = pg.image.load(root_img_dir + "\\instructions_druk.png")
+img_instructions_button = pg.image.load(root_img_dir + "instructions.png")
+img_instructions_button_pressed = pg.image.load(root_img_dir + "instructions_druk.png")
 
-img_background = pg.image.load(root_img_dir + "\\menu_achtergrond.png")
-img_title = pg.image.load(root_img_dir + "\\titel.png")
+img_background = pg.image.load(root_img_dir + "menu_achtergrond.png")
+img_title = pg.image.load(root_img_dir + "titel.png")
 img_icon = pg.image.load(root_img_dir + "icon.png")
 pg.display.set_icon(img_icon)
 
@@ -145,20 +147,27 @@ instruction_texts_array = [
     [texts.quit,img_quit_button],
     ]
 
+mess_pos_array = [
+
+    
+]
+
 credits_text = credit_text.credits
 
 def loadmap():
-    if os.path.exists(root_dir + "\\maps\\" + map_file_name + ".npy"):
-        return np.load(root_dir + "\\maps\\" + map_file_name + ".npy")
+    if os.path.exists(root_dir + "maps" + map_file_name + ".npy"):
+        return np.load(root_dir + "maps" + map_file_name + ".npy")
     else:
-        return np.load(root_dir + "\\maps\\testlvl.npy")
+        return np.load(root_dir + "/maps/testlvl.npy")
 
 
 activemap = loadmap()
 
 
 
-def drawgrid(start_point, activemap, player=None):
+def drawgrid(mess_array_fill, start_point, activemap, mess_pos_array, player=None):
+    mess_array_fill = mess_array_fill
+    mess_pos_array = mess_pos_array
     blocksize = 50
     array = activemap
     start_point = start_point
@@ -178,8 +187,10 @@ def drawgrid(start_point, activemap, player=None):
             if array[row][col] == 2 and start_point == (0, 0):
                 start_point = (x-(blocksize/2)+50, y-(blocksize/2)+50)
             if array[row][col] == 0:
-                pos = (x, y)
-    return start_point
+                if mess_array_fill:
+                    mess_pos_array.append([x, y])
+                    print(mess_pos_array)
+    return start_point, mess_pos_array
 
 
 def drawgridmaker(mx, my):
@@ -206,7 +217,7 @@ def drawgridmaker(mx, my):
             elif activemap[row][col] == 0:
                 pg.draw.rect(WINDOW, white, rect, 1)
 
-# these 2 functions render the texts,
+# these 2 functions are used for rendering the texts,
 # dont ask me how because it costs me to much of my own sanity to figure out
 def flatten_text(text):
     flattened_text = []
@@ -221,18 +232,18 @@ def flatten_text(text):
 
 
 def render_texts(text, text_posX, text_posY, word_spacing):
-    text_posY_current = text_posY  # keep track of current y position
+    text_posY_current = text_posY
     for line in text:
-        words = line.split()  # split line into separate words
-        text_posX_current = text_posX  # reset x position for each line
+        words = line.split()
+        text_posX_current = text_posX
         for word in words:
             text_surface = font.render(word, True, (255, 255, 255))
             text_rect = text_surface.get_rect()
             text_rect.x = text_posX_current
             text_rect.y = text_posY_current
             WINDOW.blit(text_surface, text_rect)
-            text_posX_current += text_rect.width + word_spacing  # add word width and spacing to x position
-        text_posY_current += text_rect.height  # add line height to y position
+            text_posX_current += text_rect.width + word_spacing
+        text_posY_current += text_rect.height
 
 
 
@@ -251,6 +262,7 @@ text_posY = 200
 word_spacing = 7
 start_battery = False
 turn_player_off = True
+mess_array_fill = True
 
 while mainmenu:
     Clock.tick(FPS)
@@ -290,7 +302,7 @@ while mainmenu:
             start_battery = True
 
         if spawn_player == False:
-            start_point = drawgrid(start_point, activemap, player)
+            start_point = drawgrid(mess_array_fill, start_point,  activemap, mess_pos_array, player)
             if battery_life < 5:
                 player.move((keys[pg.K_RIGHT] - keys[pg.K_LEFT]) * speed, (keys[pg.K_DOWN] - keys[pg.K_UP]) * speed)
             else: 
@@ -301,7 +313,7 @@ while mainmenu:
                 battery_timer = time.time()
             player.draw()
         else:
-            start_point = drawgrid(start_point, activemap)
+            start_point, mess_pos_array = drawgrid(mess_array_fill, start_point, activemap, mess_pos_array)
 
         if start_battery == True and time.time() - battery_timer > 5:
             battery_life += 1
@@ -323,6 +335,8 @@ while mainmenu:
 
         if event.type == pg.QUIT:
             pg.quit()
+            
+        mess_array_fill = False
         pg.display.flip()
 
     while instructions:
@@ -357,7 +371,6 @@ while mainmenu:
         if keys[pg.K_q] or event.type == pg.QUIT:
             mainmenu = True
             instructions = False
-
         pg.display.flip()
 
     while credits:

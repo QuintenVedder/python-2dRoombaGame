@@ -1,5 +1,6 @@
 import pygame as pg
 import math
+import random
 class Player:
     def __init__(self, name, x, y, radius, color, WINDOW, player_images_off, player_images_on):
         self.name = name
@@ -130,3 +131,36 @@ class Battery:
 
     def draw(self):
         self.WINDOW.blit(self.facing, (self.x, self.y))
+
+class Mess:
+    def __init__(self, x, y, WINDOW, mess_images):
+        self.x = x
+        self.y = y
+        self.middlex = self.x - (self.x / 2)
+        self.middley = self.y - (self.y / 2)
+        self.WINDOW = WINDOW  
+        self.image = mess_images[random.randint(0, len(mess_images))]
+
+    def draw(self):
+        self.WINDOW.blit(self.image, (self.x - (self.x / 2), self.y - (self.y / 2)))
+
+    def handle_collision(mess, player):
+
+        closest_x = max(block.left, min(player.x, block.right))
+        closest_y = max(block.top, min(player.y, block.bottom))
+        distance = math.sqrt((player.x - closest_x)**2 + (player.y - closest_y)**2)
+        
+        if distance < player.radius:
+            overlap_x = player.radius - abs(player.x - closest_x)
+            overlap_y = player.radius - abs(player.y - closest_y)
+            
+            if overlap_x < overlap_y:
+                if player.x < closest_x:
+                    player.x -= overlap_x
+                else:
+                    player.x += overlap_x
+            else:
+                if player.y < closest_y:
+                    player.y -= overlap_y
+                else:
+                    player.y += overlap_y
