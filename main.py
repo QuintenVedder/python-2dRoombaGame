@@ -25,6 +25,10 @@ Clock = pg.time.Clock()
 FPS = 30
 timer = time.time()
 
+# vars for drawgrid()
+highest_x = 0
+highest_y = 0
+
 black = (0, 0, 0)
 aplha_black = (0, 0, 0, 50)
 white = (255, 255, 255)
@@ -37,16 +41,18 @@ WINDOW = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 font = pg.font.Font(None, 30)
 pg.display.set_caption('OH YEAHHH!!')
 
+
 def get_current_file_path():
     current_file = __file__
     parent_directory = os.path.abspath(os.path.join(current_file, os.pardir))
     parent_directory = parent_directory.replace(os.path.sep, '/')
     return parent_directory
 
+
 # images
 root_dir = get_current_file_path()
 root_img_dir = root_dir + "/images/"
-#player movement images. i know the variable names suck, deal with it!
+# player movement images. i know the variable names suck, deal with it!
 off_down = pg.image.load(root_img_dir + "redroomba_down.png")
 off_left = pg.image.load(root_img_dir + "redroomba_left.png")
 off_right = pg.image.load(root_img_dir + "redroomba_right.png")
@@ -56,14 +62,14 @@ on_left = pg.image.load(root_img_dir + "roomba_left.png")
 on_right = pg.image.load(root_img_dir + "roomba_right.png")
 on_up = pg.image.load(root_img_dir + "roomba_up.png")
 
-#battery images img-1 is full and 5 empty 
+# battery images img-1 is full and 5 empty
 img_battery_1 = pg.image.load(root_img_dir + "battery_1.png")
 img_battery_2 = pg.image.load(root_img_dir + "battery_2.png")
 img_battery_3 = pg.image.load(root_img_dir + "battery_3.png")
 img_battery_4 = pg.image.load(root_img_dir + "battery_4.png")
 img_battery_5 = pg.image.load(root_img_dir + "battery_5.png")
 
-#button images
+# button images
 img_start_button = pg.image.load(root_img_dir + "start.png")
 img_start_button_pressed = pg.image.load(root_img_dir + "start_druk.png")
 
@@ -86,7 +92,8 @@ img_credits_button = pg.image.load(root_img_dir + "credits.png")
 img_credits_button_pressed = pg.image.load(root_img_dir + "credits_druk.png")
 
 img_instructions_button = pg.image.load(root_img_dir + "instructions.png")
-img_instructions_button_pressed = pg.image.load(root_img_dir + "instructions_druk.png")
+img_instructions_button_pressed = pg.image.load(
+    root_img_dir + "instructions_druk.png")
 
 img_background = pg.image.load(root_img_dir + "menu_achtergrond.png")
 img_title = pg.image.load(root_img_dir + "titel.png")
@@ -120,39 +127,51 @@ instructions_title_posY = 0
 instructions_arrowleft_posX = 0
 instructions_arrowrigth_posX = (WINDOW_WIDTH - arrowbuttonwidth)
 instructions_arrows_posY = (WINDOW_HEIGHT - arrowbuttonheight)/2
-#making buttons
-quitButton = Button(img_quit_button, img_quit_button_pressed, buttonquitposX, buttonquitposY, buttonwidth, buttonheight, WINDOW)
-mapmakingButton = Button(img_maps_button, img_maps_button_pressed, buttonmapmakingposX, buttonmapmakingposY, buttonwidth, buttonheight, WINDOW)
-mapmakingButton = Button(img_maps_button, img_maps_button_pressed, buttonmapmakingposX, buttonmapmakingposY, buttonwidth, buttonheight, WINDOW)
-playButton = Button(img_play_button, img_play_button_pressed, buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
-startButton = Button(img_start_button, img_start_button_pressed, buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
-instructionsButton = Button(img_instructions_button, img_instructions_button_pressed, buttoninstructionsX, buttoninstructionsY, buttonwidth, buttonheight, WINDOW)
-creditsButton = Button(img_credits_button, img_credits_button_pressed, buttoncreditsX, buttoncreditsY, buttonwidth, buttonheight, WINDOW)
-arrow_leftButton = Button(img_leftarrow_button, img_leftarrow_button_pressed, instructions_arrowleft_posX, instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
-arrow_rightButton = Button(img_rightarrow_button, img_rightarrow_button_pressed, instructions_arrowrigth_posX, instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
+# making buttons
+quitButton = Button(img_quit_button, img_quit_button_pressed,
+                    buttonquitposX, buttonquitposY, buttonwidth, buttonheight, WINDOW)
+mapmakingButton = Button(img_maps_button, img_maps_button_pressed,
+                         buttonmapmakingposX, buttonmapmakingposY, buttonwidth, buttonheight, WINDOW)
+mapmakingButton = Button(img_maps_button, img_maps_button_pressed,
+                         buttonmapmakingposX, buttonmapmakingposY, buttonwidth, buttonheight, WINDOW)
+playButton = Button(img_play_button, img_play_button_pressed,
+                    buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
+startButton = Button(img_start_button, img_start_button_pressed,
+                     buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
+instructionsButton = Button(img_instructions_button, img_instructions_button_pressed,
+                            buttoninstructionsX, buttoninstructionsY, buttonwidth, buttonheight, WINDOW)
+creditsButton = Button(img_credits_button, img_credits_button_pressed,
+                       buttoncreditsX, buttoncreditsY, buttonwidth, buttonheight, WINDOW)
+arrow_leftButton = Button(img_leftarrow_button, img_leftarrow_button_pressed, instructions_arrowleft_posX,
+                          instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
+arrow_rightButton = Button(img_rightarrow_button, img_rightarrow_button_pressed,
+                           instructions_arrowrigth_posX, instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
 
 # lists for things ;)
 arrows = [arrow_leftButton, arrow_rightButton]
-buttons = [quitButton, mapmakingButton, playButton, instructionsButton, creditsButton]
+buttons = [quitButton, mapmakingButton,
+           playButton, instructionsButton, creditsButton]
 player_images_on = [on_up, on_down, on_left, on_right]
 player_images_off = [off_up, off_down, off_left, off_right]
 player_images = player_images_on
-battery_images = [img_battery_1, img_battery_2, img_battery_3, img_battery_4, img_battery_5]
+battery_images = [img_battery_1, img_battery_2,
+                  img_battery_3, img_battery_4, img_battery_5]
 trash_pos = []
 
 
 instruction_texts_array = [
-    [texts.play,img_play_button],
-    [texts.maps,img_maps_button],
-    [texts.quit,img_quit_button],
-    ]
+    [texts.play, img_play_button],
+    [texts.maps, img_maps_button],
+    [texts.quit, img_quit_button],
+]
 
 mess_pos_array = [
 
-    
+
 ]
 
 credits_text = credit_text.credits
+
 
 def loadmap():
     if os.path.exists(root_dir + "maps" + map_file_name + ".npy"):
@@ -164,8 +183,11 @@ def loadmap():
 activemap = loadmap()
 
 
-
-def drawgrid(mess_array_fill, start_point, activemap, mess_pos_array, player=None):
+def drawgrid(highest_x, highest_y, mess_array_fill, start_point, activemap, mess_pos_array, player=None):
+    h_x = highest_x
+    h_y = len(activemap) * 50  # Initialize h_y with the highest possible value based on the array size
+    max_x = -1
+    max_y = -1
     mess_array_fill = mess_array_fill
     mess_pos_array = mess_pos_array
     blocksize = 50
@@ -186,14 +208,23 @@ def drawgrid(mess_array_fill, start_point, activemap, mess_pos_array, player=Non
 
             if array[row][col] == 2 and start_point == (0, 0):
                 start_point = (x-(blocksize/2)+50, y-(blocksize/2)+50)
+                
             if array[row][col] == 0:
-                if mess_array_fill and len(mess_pos_array) <= 115: 
-                    mess_pos_array.append([x, y])
-                else:
-                    if mess_array_fill:
-                        print(mess_pos_array)
+                print(x, h_x, y, h_y)
+                if x == h_x and y == h_y:
+                    # print(mess_pos_array)
                     mess_array_fill = False
-    return start_point, mess_pos_array, mess_array_fill
+                elif mess_array_fill:
+                    max_x = max(x, max_x)
+                    max_y = max(y, max_y)
+                    if max_x == x:  # Update h_x only when a new maximum x is encountered
+                        h_x = max_x
+                    if max_y == y:  # Update h_y only when a new maximum y is encountered
+                        h_y = max_y
+                    mess_pos_array.append([x, y])
+
+    return h_x, h_y, start_point, mess_pos_array, mess_array_fill
+ 
 
 
 def drawgridmaker(mx, my):
@@ -222,6 +253,8 @@ def drawgridmaker(mx, my):
 
 # these 2 functions are used for rendering the texts,
 # dont ask me how because it costs me to much of my own sanity to figure out
+
+
 def flatten_text(text):
     flattened_text = []
 
@@ -247,7 +280,6 @@ def render_texts(text, text_posX, text_posY, word_spacing):
             WINDOW.blit(text_surface, text_rect)
             text_posX_current += text_rect.width + word_spacing
         text_posY_current += text_rect.height
-
 
 
 runmapmaker = False
@@ -277,7 +309,7 @@ while mainmenu:
 
         for event in pg.event.get():
             if event.type == pg.KEYDOWN:
-                a=1
+                a = 1
 
         if keys[pg.K_s]:
             np.save("shootergame/maps/" + map_file_name, activemap)
@@ -297,18 +329,21 @@ while mainmenu:
         WINDOW.blit(img_background, (0, 0))
         keys = pg.key.get_pressed()
         if spawn_player and start_point != (0, 0):
-            player = Player("player", start_point[0], start_point[1], player_radius, player_color, WINDOW, player_images_off, player_images_on)
-            battery = Battery(batteryX, batteryY,WINDOW, battery_images)
+            player = Player("player", start_point[0], start_point[1], player_radius,
+                            player_color, WINDOW, player_images_off, player_images_on)
+            battery = Battery(batteryX, batteryY, WINDOW, battery_images)
             spawn_player = False
             battery_life = 1
             battery_timer = time.time()
             start_battery = True
 
         if spawn_player == False:
-            start_point = drawgrid(mess_array_fill, start_point,  activemap, mess_pos_array, player)
+            start_point = drawgrid(highest_x, highest_y, mess_array_fill,
+                                   start_point,  activemap, mess_pos_array, player)
             if battery_life < 5:
-                player.move((keys[pg.K_RIGHT] - keys[pg.K_LEFT]) * speed, (keys[pg.K_DOWN] - keys[pg.K_UP]) * speed)
-            else: 
+                player.move((keys[pg.K_RIGHT] - keys[pg.K_LEFT]) *
+                            speed, (keys[pg.K_DOWN] - keys[pg.K_UP]) * speed)
+            else:
                 if turn_player_off:
                     player.change_color()
                     player.draw()
@@ -316,12 +351,13 @@ while mainmenu:
                 battery_timer = time.time()
             player.draw()
         else:
-            start_point, mess_pos_array, mess_array_fill = drawgrid(mess_array_fill, start_point, activemap, mess_pos_array)
+            highest_x, highest_y, start_point, mess_pos_array, mess_array_fill = drawgrid(
+                highest_x, highest_y, mess_array_fill, start_point, activemap, mess_pos_array)
 
         if start_battery == True and time.time() - battery_timer > 5:
             battery_life += 1
             battery_timer = time.time()
-            
+
         if start_battery:
             battery.battery_life(battery_life)
             battery.draw()
@@ -338,7 +374,7 @@ while mainmenu:
 
         if event.type == pg.QUIT:
             pg.quit()
-            
+
         pg.display.flip()
 
     while instructions:
@@ -356,16 +392,18 @@ while mainmenu:
                     if current_text == len(instruction_texts_array)-1:
                         current_text = 0
                     else:
-                        current_text+=1
+                        current_text += 1
 
                 if arrow_leftButton.handle_collision():
                     if current_text == 0:
                         current_text = len(instruction_texts_array)-1
                     else:
-                        current_text-=1
-        flattened_texts = flatten_text(instruction_texts_array[current_text][0])
+                        current_text -= 1
+        flattened_texts = flatten_text(
+            instruction_texts_array[current_text][0])
         render_texts(flattened_texts, text_posX, text_posY, word_spacing)
-        WINDOW.blit(instruction_texts_array[current_text][1], (instructions_title_posX, instructions_title_posY))
+        WINDOW.blit(instruction_texts_array[current_text][1],
+                    (instructions_title_posX, instructions_title_posY))
         for arrow in arrows:
             arrow.handle_collision()
             arrow.draw()
@@ -379,7 +417,7 @@ while mainmenu:
         WINDOW.blit(img_background, (0, 0))
         keys = pg.key.get_pressed()
         for event in pg.event.get():
-    
+
             if event.type == pg.QUIT:
                 pg.quit()
 
@@ -391,9 +429,6 @@ while mainmenu:
             credits = False
 
         pg.display.flip()
-
-
-
 
     WINDOW.fill((white))
     WINDOW.blit(img_background, (0, 0))
@@ -410,10 +445,10 @@ while mainmenu:
     for event in pg.event.get():
 
         if event.type == pg.QUIT:
-                pg.quit()
+            pg.quit()
 
         if event.type == pg.MOUSEBUTTONDOWN:
-            
+
             if quitButton.handle_collision() and start:
                 pg.quit()
 
