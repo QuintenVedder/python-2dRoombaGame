@@ -187,10 +187,13 @@ def drawgrid(mess_array_fill, start_point, activemap, mess_pos_array, player=Non
             if array[row][col] == 2 and start_point == (0, 0):
                 start_point = (x-(blocksize/2)+50, y-(blocksize/2)+50)
             if array[row][col] == 0:
-                if mess_array_fill:
+                if mess_array_fill and len(mess_pos_array) <= 115: 
                     mess_pos_array.append([x, y])
-                    print(mess_pos_array)
-    return start_point, mess_pos_array
+                else:
+                    if mess_array_fill:
+                        print(mess_pos_array)
+                    mess_array_fill = False
+    return start_point, mess_pos_array, mess_array_fill
 
 
 def drawgridmaker(mx, my):
@@ -313,7 +316,7 @@ while mainmenu:
                 battery_timer = time.time()
             player.draw()
         else:
-            start_point, mess_pos_array = drawgrid(mess_array_fill, start_point, activemap, mess_pos_array)
+            start_point, mess_pos_array, mess_array_fill = drawgrid(mess_array_fill, start_point, activemap, mess_pos_array)
 
         if start_battery == True and time.time() - battery_timer > 5:
             battery_life += 1
@@ -336,7 +339,6 @@ while mainmenu:
         if event.type == pg.QUIT:
             pg.quit()
             
-        mess_array_fill = False
         pg.display.flip()
 
     while instructions:
