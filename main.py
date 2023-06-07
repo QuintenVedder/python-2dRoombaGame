@@ -5,7 +5,7 @@ import maps
 import pygame as pg
 import os
 import sys
-from classes import Player, Block, Button, Battery
+from classes import Player, Block, Button, Battery, Mess
 import instruction_texts as texts
 import credit_text
 
@@ -98,6 +98,7 @@ img_instructions_button_pressed = pg.image.load(
 img_background = pg.image.load(root_img_dir + "menu_achtergrond.png")
 img_title = pg.image.load(root_img_dir + "titel.png")
 img_icon = pg.image.load(root_img_dir + "icon.png")
+img_mess = pg.image.load(root_img_dir + "dirt.png")
 pg.display.set_icon(img_icon)
 
 # button variables
@@ -277,9 +278,23 @@ def render_texts(text, text_posX, text_posY, word_spacing):
             text_posX_current += text_rect.width + word_spacing
         text_posY_current += text_rect.height
 
+first_mess = True
+mess = None
+def place_mess(mess_pos_array, player, first_mess):
+    global mess
 
-def place_mess(array):
-    a=1
+    if first_mess:
+        mess = Mess(mess_pos_array, WINDOW, img_mess)
+        mess.position()
+        mess.handle_collision(player)
+        mess.draw()
+        first_mess = False
+
+    if first_mess == False and mess.handle_collision(player) == True:
+        mess.position()
+
+    mess.draw()
+    return first_mess
     
 
 runmapmaker = False
@@ -355,7 +370,7 @@ while mainmenu:
             space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point, activemap, mess_pos_array)
 
         if mess_array_fill == False:
-            place_mess(mess_pos_array)
+            first_mess = place_mess(mess_pos_array, player, first_mess)
 
 
         if start_battery == True and time.time() - battery_timer > 5:

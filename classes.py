@@ -133,36 +133,32 @@ class Battery:
         self.WINDOW.blit(self.facing, (self.x, self.y))
 
 class Mess:
-    def __init__(self, WINDOW, mess_images):
+    def __init__(self, array, WINDOW, mess_images):
         self.WINDOW = WINDOW  
-        self.image = mess_images[random.randint(0, len(mess_images))]
+        #self.image = mess_images[random.randint(0, len(mess_images))]
+        self.image = mess_images
+        self.pos_array = array
 
-    def position(self, x, y):
-        self.x = x
-        self.y = y
+    def position(self):
+        pos = random.randint(0, len(self.pos_array))
+        self.x = self.pos_array[pos][0]
+        self.y = self.pos_array[pos][1]
+        self.top = self.y
+        self.left = self.x
+        self.bottom = self.y + 50
+        self.right = self.x + 50
         self.middlex = self.x - (self.x / 2)
         self.middley = self.y - (self.y / 2)
 
     def draw(self):
-        self.WINDOW.blit(self.image, (self.x - (self.x / 2), self.y - (self.y / 2)))
+        self.WINDOW.blit(self.image, (self.x, self.y))
 
     def handle_collision(mess, player):
 
-        closest_x = max(block.left, min(player.x, block.right))
-        closest_y = max(block.top, min(player.y, block.bottom))
+        closest_x = max(mess.left, min(player.x, mess.right))
+        closest_y = max(mess.top, min(player.y, mess.bottom))
         distance = math.sqrt((player.x - closest_x)**2 + (player.y - closest_y)**2)
         
         if distance < player.radius:
-            overlap_x = player.radius - abs(player.x - closest_x)
-            overlap_y = player.radius - abs(player.y - closest_y)
-            
-            if overlap_x < overlap_y:
-                if player.x < closest_x:
-                    player.x -= overlap_x
-                else:
-                    player.x += overlap_x
-            else:
-                if player.y < closest_y:
-                    player.y -= overlap_y
-                else:
-                    player.y += overlap_y
+            return True
+        return False
