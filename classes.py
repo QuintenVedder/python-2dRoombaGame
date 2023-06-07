@@ -133,13 +133,15 @@ class Battery:
         self.WINDOW.blit(self.facing, (self.x, self.y))
 
 class Mess:
-    def __init__(self, x, y, WINDOW, mess_images):
+    def __init__(self, WINDOW, mess_images):
+        self.WINDOW = WINDOW  
+        self.image = mess_images[random.randint(0, len(mess_images))]
+
+    def position(self, x, y):
         self.x = x
         self.y = y
         self.middlex = self.x - (self.x / 2)
         self.middley = self.y - (self.y / 2)
-        self.WINDOW = WINDOW  
-        self.image = mess_images[random.randint(0, len(mess_images))]
 
     def draw(self):
         self.WINDOW.blit(self.image, (self.x - (self.x / 2), self.y - (self.y / 2)))

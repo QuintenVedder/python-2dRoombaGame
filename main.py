@@ -182,12 +182,11 @@ def loadmap():
 
 activemap = loadmap()
 
-
-def drawgrid(highest_x, highest_y, mess_array_fill, start_point, activemap, mess_pos_array, player=None):
-    h_x = highest_x
-    h_y = len(activemap) * 50  # Initialize h_y with the highest possible value based on the array size
-    max_x = -1
-    max_y = -1
+max_blocks = 200
+space_blocks = 0
+filled_blocks = 0
+def drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point, activemap, mess_pos_array, player=None):
+    max_blocks, space_blocks, filled_blocks = max_blocks, space_blocks, filled_blocks
     mess_array_fill = mess_array_fill
     mess_pos_array = mess_pos_array
     blocksize = 50
@@ -199,6 +198,8 @@ def drawgrid(highest_x, highest_y, mess_array_fill, start_point, activemap, mess
             y = row * blocksize
             block = Block(x, y, blocksize, blocksize, WINDOW)
             if array[row][col] == 1:
+                if max_blocks > (filled_blocks + space_blocks):
+                    filled_blocks += 1
                 if player is not None:
                     player.handle_collision(block)
                 block.draw(black)
@@ -207,23 +208,18 @@ def drawgrid(highest_x, highest_y, mess_array_fill, start_point, activemap, mess
                 WINDOW.blit(block_alphasurface, (x, y+25))
 
             if array[row][col] == 2 and start_point == (0, 0):
+                if max_blocks > (filled_blocks + space_blocks):
+                    filled_blocks += 1
                 start_point = (x-(blocksize/2)+50, y-(blocksize/2)+50)
                 
-            if array[row][col] == 0:
-                print(x, h_x, y, h_y)
-                if x == h_x and y == h_y:
-                    # print(mess_pos_array)
-                    mess_array_fill = False
-                elif mess_array_fill:
-                    max_x = max(x, max_x)
-                    max_y = max(y, max_y)
-                    if max_x == x:  # Update h_x only when a new maximum x is encountered
-                        h_x = max_x
-                    if max_y == y:  # Update h_y only when a new maximum y is encountered
-                        h_y = max_y
-                    mess_pos_array.append([x, y])
+            if array[row][col] == 0 and mess_array_fill != False:
+                    if max_blocks > (filled_blocks + space_blocks):
+                        mess_pos_array.append([x, y])
+                        space_blocks += 1
+                    elif max_blocks == (filled_blocks + space_blocks):
+                        mess_array_fill = False
 
-    return h_x, h_y, start_point, mess_pos_array, mess_array_fill
+    return space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill
  
 
 
@@ -282,6 +278,10 @@ def render_texts(text, text_posX, text_posY, word_spacing):
         text_posY_current += text_rect.height
 
 
+def place_mess(array):
+    a=1
+    
+
 runmapmaker = False
 runplay = False
 mainmenu = True
@@ -338,8 +338,9 @@ while mainmenu:
             start_battery = True
 
         if spawn_player == False:
-            start_point = drawgrid(highest_x, highest_y, mess_array_fill,
-                                   start_point,  activemap, mess_pos_array, player)
+            # added all vars to be returned, used to be only start_point. apperently this works and mess_array_fill is now finally False
+            space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point,  activemap, mess_pos_array, player)
+
             if battery_life < 5:
                 player.move((keys[pg.K_RIGHT] - keys[pg.K_LEFT]) *
                             speed, (keys[pg.K_DOWN] - keys[pg.K_UP]) * speed)
@@ -351,8 +352,11 @@ while mainmenu:
                 battery_timer = time.time()
             player.draw()
         else:
-            highest_x, highest_y, start_point, mess_pos_array, mess_array_fill = drawgrid(
-                highest_x, highest_y, mess_array_fill, start_point, activemap, mess_pos_array)
+            space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point, activemap, mess_pos_array)
+
+        if mess_array_fill == False:
+            place_mess(mess_pos_array)
+
 
         if start_battery == True and time.time() - battery_timer > 5:
             battery_life += 1
