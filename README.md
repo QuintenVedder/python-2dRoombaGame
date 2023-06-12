@@ -9,4 +9,7 @@ and there is a .bat file, if you run this file it will install the "pygame" and 
 if windows gives a warning just open the file in any text editor and copy/paste the commands in your terminal
 
 more information of the game is given in the instructions tab in the game itself, goodluck!
+![Screenshot 2023-06-12 143337](https://github.com/quintendebeste/pyhton-2dRoombaGame/assets/98585046/c604d4c1-4f04-4ddf-9e21-9eb7a500dc0e)
+![Screenshot 2023-06-12 143021](https://github.com/quintendebeste/pyhton-2dRoombaGame/assets/98585046/9738047b-8020-4040-8a4e-6e7edb930e90)
+![Screenshot 2023-06-12 142939](https://github.com/quintendebeste/pyhton-2dRoombaGame/assets/98585046/940677d9-c968-4096-83e5-cab1ebe05b05)
 
