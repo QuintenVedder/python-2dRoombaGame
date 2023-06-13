@@ -18,7 +18,7 @@ https://github.com/quintendebeste/pyhton-2dRoombaGame/assets/98585046/3e2f6489-3
 
 things i still need to add to the game:
 1. start location becoms a charger so you could recharge the battery
-2. saving and loading maps
+2. saving and loading maps + better ui
 3. power-ups maybe
 
 want to contact me here's my discord: Quintonicus#8921
