@@ -21,5 +21,5 @@ things i still need to add to the game:
 2. saving and loading maps + better ui
 3. power-ups maybe
 
-want to contact me here's my discord: Quintonicus#8921
+want to contact me here's my discord: quintendebeste#8921
 
