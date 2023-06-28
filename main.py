@@ -76,6 +76,9 @@ img_start_button_pressed = pg.image.load(root_img_dir + "start_druk.png")
 img_maps_button = pg.image.load(root_img_dir + "maps.png")
 img_maps_button_pressed = pg.image.load(root_img_dir + "maps_druk.png")
 
+img_mapmaker_button = pg.image.load(root_img_dir + "maps.png")
+img_mapmaker_button_pressed = pg.image.load(root_img_dir + "maps_druk.png")
+
 img_quit_button = pg.image.load(root_img_dir + "quit.png")
 img_quit_button_pressed = pg.image.load(root_img_dir + "quit_druk.png")
 
@@ -92,8 +95,7 @@ img_credits_button = pg.image.load(root_img_dir + "credits.png")
 img_credits_button_pressed = pg.image.load(root_img_dir + "credits_druk.png")
 
 img_instructions_button = pg.image.load(root_img_dir + "instructions.png")
-img_instructions_button_pressed = pg.image.load(
-    root_img_dir + "instructions_druk.png")
+img_instructions_button_pressed = pg.image.load(root_img_dir + "instructions_druk.png")
 
 img_background = pg.image.load(root_img_dir + "menu_achtergrond.png")
 img_title = pg.image.load(root_img_dir + "titel.png")
@@ -110,8 +112,11 @@ arrowbuttonheight = 150
 buttonquitposX = (WINDOW_WIDTH - buttonwidth)/2
 buttonquitposY = ((WINDOW_HEIGHT + 200) - buttonheight)/2
 
-buttonmapmakingposX = (WINDOW_WIDTH - buttonwidth)/2
-buttonmapmakingposY = ((WINDOW_HEIGHT - 100) - buttonheight)/2
+buttonmapsposX = (WINDOW_WIDTH - buttonwidth)/2
+buttonmapsposY = ((WINDOW_HEIGHT - 100) - buttonheight)/2
+
+buttonmapmakerposX = (WINDOW_WIDTH - buttonwidth)/2
+buttonmapmakerposY = ((WINDOW_HEIGHT - 100) - buttonheight)/2
 
 buttonplayX = (WINDOW_WIDTH - buttonwidth)/2
 buttonplayY = ((WINDOW_HEIGHT + 50) - buttonheight)/2
@@ -128,37 +133,26 @@ instructions_title_posY = 0
 instructions_arrowleft_posX = 0
 instructions_arrowrigth_posX = (WINDOW_WIDTH - arrowbuttonwidth)
 instructions_arrows_posY = (WINDOW_HEIGHT - arrowbuttonheight)/2
+
 # making buttons
-quitButton = Button(img_quit_button, img_quit_button_pressed,
-                    buttonquitposX, buttonquitposY, buttonwidth, buttonheight, WINDOW)
-mapmakingButton = Button(img_maps_button, img_maps_button_pressed,
-                         buttonmapmakingposX, buttonmapmakingposY, buttonwidth, buttonheight, WINDOW)
-mapmakingButton = Button(img_maps_button, img_maps_button_pressed,
-                         buttonmapmakingposX, buttonmapmakingposY, buttonwidth, buttonheight, WINDOW)
-playButton = Button(img_play_button, img_play_button_pressed,
-                    buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
-startButton = Button(img_start_button, img_start_button_pressed,
-                     buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
-instructionsButton = Button(img_instructions_button, img_instructions_button_pressed,
-                            buttoninstructionsX, buttoninstructionsY, buttonwidth, buttonheight, WINDOW)
-creditsButton = Button(img_credits_button, img_credits_button_pressed,
-                       buttoncreditsX, buttoncreditsY, buttonwidth, buttonheight, WINDOW)
-arrow_leftButton = Button(img_leftarrow_button, img_leftarrow_button_pressed, instructions_arrowleft_posX,
-                          instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
-arrow_rightButton = Button(img_rightarrow_button, img_rightarrow_button_pressed,
-                           instructions_arrowrigth_posX, instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
+quitButton = Button(img_quit_button, img_quit_button_pressed, buttonquitposX, buttonquitposY, buttonwidth, buttonheight, WINDOW)
+mapsButton = Button(img_maps_button, img_maps_button_pressed, buttonmapsposX, buttonmapsposY, buttonwidth, buttonheight, WINDOW)
+mapmakerButton = Button(img_mapmaker_button, img_mapmaker_button_pressed, buttonmapmakerposX, buttonmapmakerposY, buttonwidth, buttonheight, WINDOW)
+playButton = Button(img_play_button, img_play_button_pressed,buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
+startButton = Button(img_start_button, img_start_button_pressed,buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
+instructionsButton = Button(img_instructions_button, img_instructions_button_pressed, buttoninstructionsX, buttoninstructionsY, buttonwidth, buttonheight, WINDOW)
+creditsButton = Button(img_credits_button, img_credits_button_pressed,buttoncreditsX, buttoncreditsY, buttonwidth, buttonheight, WINDOW)
+arrow_leftButton = Button(img_leftarrow_button, img_leftarrow_button_pressed, instructions_arrowleft_posX, instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
+arrow_rightButton = Button(img_rightarrow_button, img_rightarrow_button_pressed, instructions_arrowrigth_posX, instructions_arrows_posY, arrowbuttonwidth, arrowbuttonheight, WINDOW)
 
 # lists for things ;)
 arrows = [arrow_leftButton, arrow_rightButton]
-buttons = [quitButton, mapmakingButton,
-           playButton, instructionsButton, creditsButton]
+buttons = [quitButton, mapsButton, playButton, instructionsButton, creditsButton]
+map_buttons = [mapmakerButton]
 player_images_on = [on_up, on_down, on_left, on_right]
 player_images_off = [off_up, off_down, off_left, off_right]
 player_images = player_images_on
-battery_images = [img_battery_1, img_battery_2,
-                  img_battery_3, img_battery_4, img_battery_5]
-trash_pos = []
-
+battery_images = [img_battery_1, img_battery_2, img_battery_3, img_battery_4, img_battery_5]
 
 instruction_texts_array = [
     [texts.play, img_play_button],
@@ -167,8 +161,6 @@ instruction_texts_array = [
 ]
 
 mess_pos_array = [
-
-
 ]
 
 credits_text = credit_text.credits
@@ -296,7 +288,7 @@ def place_mess(mess_pos_array, player, first_mess):
     mess.draw()
     return first_mess
     
-
+runmaps = False
 runmapmaker = False
 runplay = False
 mainmenu = True
@@ -471,12 +463,15 @@ while mainmenu:
             if quitButton.handle_collision() and start:
                 pg.quit()
 
-            if mapmakingButton.handle_collision() and start:
+            if mapmakerButton.handle_collision() and runmaps:
                 runmapmaker = True
+
+            if mapsButton.handle_collision() and start:
+                runmaps = True
 
             if playButton.handle_collision() and start:
                 runplay = True
-
+            #startbutton stays here otherwise bugs might appear
             if startButton.handle_collision():
                 start = True
 
@@ -489,8 +484,12 @@ while mainmenu:
     if start == False:
         startButton.handle_collision()
         startButton.draw()
-    if start:
+    if start and runmaps != True:
         for button in buttons:
+            button.handle_collision()
+            button.draw()
+    if runmaps:
+        for button in map_buttons:
             button.handle_collision()
             button.draw()
 
