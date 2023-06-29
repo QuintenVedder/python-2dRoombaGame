@@ -1,16 +1,17 @@
 import time
 import numpy as np
 import random
-import maps
+import shutil
 import pygame as pg
 import os
 import sys
+sys.path.append('maps')
+from MapSaver import save_map
+sys.path.append('..')
 from classes import Player, Block, Button, Battery, Mess
 import instruction_texts as texts
 import credit_text
 
-
-sys.path.append('shootergame/maps/')
 pg.init()
 map_name = str(random.randint(0, 99999999999999))
 map_file_name = "{}".format(map_name)
@@ -39,7 +40,7 @@ WINDOW_HEIGHT = 500
 WINDOW_WIDTH = 1000
 WINDOW = pg.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 font = pg.font.Font(None, 30)
-pg.display.set_caption('OH YEAHHH!!')
+pg.display.set_caption('Sweeping Shenanigans')
 
 
 def get_current_file_path():
@@ -76,8 +77,14 @@ img_start_button_pressed = pg.image.load(root_img_dir + "start_druk.png")
 img_maps_button = pg.image.load(root_img_dir + "maps.png")
 img_maps_button_pressed = pg.image.load(root_img_dir + "maps_druk.png")
 
-img_mapmaker_button = pg.image.load(root_img_dir + "maps.png")
-img_mapmaker_button_pressed = pg.image.load(root_img_dir + "maps_druk.png")
+img_mapmaker_button = pg.image.load(root_img_dir + "placeholder.png")
+img_mapmaker_button_pressed = pg.image.load(root_img_dir + "placeholder.png")
+
+img_devlevels_button = pg.image.load(root_img_dir + "placeholder.png")
+img_devlevels_button_pressed = pg.image.load(root_img_dir + "placeholder.png")
+
+img_back_button = pg.image.load(root_img_dir + "placeholder.png")
+img_back_button_pressed = pg.image.load(root_img_dir + "placeholder.png")
 
 img_quit_button = pg.image.load(root_img_dir + "quit.png")
 img_quit_button_pressed = pg.image.load(root_img_dir + "quit_druk.png")
@@ -118,6 +125,12 @@ buttonmapsposY = ((WINDOW_HEIGHT - 100) - buttonheight)/2
 buttonmapmakerposX = (WINDOW_WIDTH - buttonwidth)/2
 buttonmapmakerposY = ((WINDOW_HEIGHT - 100) - buttonheight)/2
 
+buttondevlevelsposX = (WINDOW_WIDTH - buttonwidth)/2
+buttondevlevelsposY = ((WINDOW_HEIGHT + 50) - buttonheight)/2
+
+buttonbackposX = (WINDOW_WIDTH - buttonwidth)/2
+buttonbackposY = ((WINDOW_HEIGHT + 200) - buttonheight)/2
+
 buttonplayX = (WINDOW_WIDTH - buttonwidth)/2
 buttonplayY = ((WINDOW_HEIGHT + 50) - buttonheight)/2
 
@@ -138,6 +151,8 @@ instructions_arrows_posY = (WINDOW_HEIGHT - arrowbuttonheight)/2
 quitButton = Button(img_quit_button, img_quit_button_pressed, buttonquitposX, buttonquitposY, buttonwidth, buttonheight, WINDOW)
 mapsButton = Button(img_maps_button, img_maps_button_pressed, buttonmapsposX, buttonmapsposY, buttonwidth, buttonheight, WINDOW)
 mapmakerButton = Button(img_mapmaker_button, img_mapmaker_button_pressed, buttonmapmakerposX, buttonmapmakerposY, buttonwidth, buttonheight, WINDOW)
+devlevelsButton = Button(img_devlevels_button, img_devlevels_button_pressed, buttondevlevelsposX, buttondevlevelsposY, buttonwidth, buttonheight, WINDOW)
+backButton = Button(img_back_button, img_back_button_pressed, buttonbackposX, buttonbackposY, buttonwidth, buttonheight, WINDOW)
 playButton = Button(img_play_button, img_play_button_pressed,buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
 startButton = Button(img_start_button, img_start_button_pressed,buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
 instructionsButton = Button(img_instructions_button, img_instructions_button_pressed, buttoninstructionsX, buttoninstructionsY, buttonwidth, buttonheight, WINDOW)
@@ -148,7 +163,7 @@ arrow_rightButton = Button(img_rightarrow_button, img_rightarrow_button_pressed,
 # lists for things ;)
 arrows = [arrow_leftButton, arrow_rightButton]
 buttons = [quitButton, mapsButton, playButton, instructionsButton, creditsButton]
-map_buttons = [mapmakerButton]
+map_buttons = [backButton, mapmakerButton, devlevelsButton]
 player_images_on = [on_up, on_down, on_left, on_right]
 player_images_off = [off_up, off_down, off_left, off_right]
 player_images = player_images_on
@@ -171,6 +186,16 @@ def loadmap():
         return np.load(root_dir + "maps" + map_file_name + ".npy")
     else:
         return np.load(root_dir + "/maps/testlvl.npy")
+    
+def delete_and_clone_file(original_file, clone_file):
+    if os.path.exists(original_file):
+        os.remove(original_file)
+        print(f"Deleted the file: {original_file}")
+
+        shutil.copy2(clone_file, original_file)
+        print(f"Cloned {clone_file} as {original_file}")
+    else:
+        print(f"The file {original_file} does not exist.")
 
 
 activemap = loadmap()
@@ -323,6 +348,7 @@ while mainmenu:
         if keys[pg.K_q]:
             mainmenu = True
             runmapmaker = False
+            delete_and_clone_file((root_dir + "/maps/testlvl.npy"),(root_dir + "/maps/testlvlbc.npy"))
 
         if event.type == pg.QUIT:
             runmapmaker = False
@@ -463,11 +489,20 @@ while mainmenu:
             if quitButton.handle_collision() and start:
                 pg.quit()
 
+            if backButton.handle_collision() and runmaps:
+                runmaps = False
+                start = True
+
             if mapmakerButton.handle_collision() and runmaps:
                 runmapmaker = True
 
+            if devlevelsButton.handle_collision() and runmaps:
+                a = 1
+            # a menu with level appears!
+
             if mapsButton.handle_collision() and start:
                 runmaps = True
+                start = False
 
             if playButton.handle_collision() and start:
                 runplay = True
@@ -481,14 +516,14 @@ while mainmenu:
             if creditsButton.handle_collision() and start:
                 credits = True
 
-    if start == False:
+    if start == False and runmaps == False:
         startButton.handle_collision()
         startButton.draw()
-    if start and runmaps != True:
+    if start and runmaps == False:
         for button in buttons:
             button.handle_collision()
             button.draw()
-    if runmaps:
+    if runmaps and start == False:
         for button in map_buttons:
             button.handle_collision()
             button.draw()
