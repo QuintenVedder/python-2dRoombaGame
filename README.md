@@ -16,10 +16,9 @@ more information of the game is given in the instructions tab in the game itself
 here's a little demo video:
 https://github.com/quintendebeste/pyhton-2dRoombaGame/assets/98585046/3e2f6489-3cce-4be2-97b1-9e199001ac11
 
-things i still need to add to the game:
+currently working on:
 1. start location becoms a charger so you could recharge the battery
-2. saving and loading maps + better ui
+2. saving and loading maps + better ui(almost done)
 3. power-ups maybe
 
-want to contact me here's my discord: quintendebeste#8921
 
