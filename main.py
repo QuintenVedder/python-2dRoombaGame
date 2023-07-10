@@ -2,12 +2,10 @@ import time
 import numpy as np
 import random
 import shutil
+import tkinter as tk
+from tkinter import messagebox
 import pygame as pg
 import os
-import sys
-sys.path.append('maps')
-from MapSaver import save_map
-sys.path.append('..')
 from classes import Player, Block, Button, Battery, Mess
 import instruction_texts as texts
 import credit_text
@@ -80,8 +78,8 @@ img_maps_button_pressed = pg.image.load(root_img_dir + "maps_druk.png")
 img_mapmaker_button = pg.image.load(root_img_dir + "placeholder.png")
 img_mapmaker_button_pressed = pg.image.load(root_img_dir + "placeholder.png")
 
-img_devlevels_button = pg.image.load(root_img_dir + "placeholder.png")
-img_devlevels_button_pressed = pg.image.load(root_img_dir + "placeholder.png")
+img_levels_button = pg.image.load(root_img_dir + "placeholder.png")
+img_levels_button_pressed = pg.image.load(root_img_dir + "placeholder.png")
 
 img_back_button = pg.image.load(root_img_dir + "placeholder.png")
 img_back_button_pressed = pg.image.load(root_img_dir + "placeholder.png")
@@ -107,7 +105,7 @@ img_instructions_button_pressed = pg.image.load(root_img_dir + "instructions_dru
 img_background = pg.image.load(root_img_dir + "menu_achtergrond.png")
 img_title = pg.image.load(root_img_dir + "titel.png")
 img_icon = pg.image.load(root_img_dir + "icon.png")
-img_mess = pg.image.load(root_img_dir + "dirt.png")
+img_mess = pg.image.load(root_img_dir + "dust.png")
 pg.display.set_icon(img_icon)
 
 # button variables
@@ -125,8 +123,8 @@ buttonmapsposY = ((WINDOW_HEIGHT - 100) - buttonheight)/2
 buttonmapmakerposX = (WINDOW_WIDTH - buttonwidth)/2
 buttonmapmakerposY = ((WINDOW_HEIGHT - 100) - buttonheight)/2
 
-buttondevlevelsposX = (WINDOW_WIDTH - buttonwidth)/2
-buttondevlevelsposY = ((WINDOW_HEIGHT + 50) - buttonheight)/2
+buttonlevelsposX = (WINDOW_WIDTH - buttonwidth)/2
+buttonlevelsposY = ((WINDOW_HEIGHT + 50) - buttonheight)/2
 
 buttonbackposX = (WINDOW_WIDTH - buttonwidth)/2
 buttonbackposY = ((WINDOW_HEIGHT + 200) - buttonheight)/2
@@ -151,7 +149,7 @@ instructions_arrows_posY = (WINDOW_HEIGHT - arrowbuttonheight)/2
 quitButton = Button(img_quit_button, img_quit_button_pressed, buttonquitposX, buttonquitposY, buttonwidth, buttonheight, WINDOW)
 mapsButton = Button(img_maps_button, img_maps_button_pressed, buttonmapsposX, buttonmapsposY, buttonwidth, buttonheight, WINDOW)
 mapmakerButton = Button(img_mapmaker_button, img_mapmaker_button_pressed, buttonmapmakerposX, buttonmapmakerposY, buttonwidth, buttonheight, WINDOW)
-devlevelsButton = Button(img_devlevels_button, img_devlevels_button_pressed, buttondevlevelsposX, buttondevlevelsposY, buttonwidth, buttonheight, WINDOW)
+levelsButton = Button(img_levels_button, img_levels_button_pressed, buttonlevelsposX, buttonlevelsposY, buttonwidth, buttonheight, WINDOW)
 backButton = Button(img_back_button, img_back_button_pressed, buttonbackposX, buttonbackposY, buttonwidth, buttonheight, WINDOW)
 playButton = Button(img_play_button, img_play_button_pressed,buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
 startButton = Button(img_start_button, img_start_button_pressed,buttonplayX, buttonplayY, buttonwidth, buttonheight, WINDOW)
@@ -163,7 +161,7 @@ arrow_rightButton = Button(img_rightarrow_button, img_rightarrow_button_pressed,
 # lists for things ;)
 arrows = [arrow_leftButton, arrow_rightButton]
 buttons = [quitButton, mapsButton, playButton, instructionsButton, creditsButton]
-map_buttons = [backButton, mapmakerButton, devlevelsButton]
+map_buttons = [backButton, mapmakerButton, levelsButton]
 player_images_on = [on_up, on_down, on_left, on_right]
 player_images_off = [off_up, off_down, off_left, off_right]
 player_images = player_images_on
@@ -181,28 +179,19 @@ mess_pos_array = [
 credits_text = credit_text.credits
 
 
-def loadmap():
+def loadmap(runmapmaker):
     if os.path.exists(root_dir + "maps" + map_file_name + ".npy"):
-        return np.load(root_dir + "maps" + map_file_name + ".npy")
+        return np.load(root_dir + "maps" + map_file_name + ".npy"), str(root_dir + "maps" + map_file_name + ".npy")
+    elif runmapmaker:
+        return np.load(root_dir + "/maps/testlvl_mapmaker.npy"), str(root_dir + "/maps/testlvl_mapmaker.npy")
     else:
-        return np.load(root_dir + "/maps/testlvl.npy")
-    
-def delete_and_clone_file(original_file, clone_file):
-    if os.path.exists(original_file):
-        os.remove(original_file)
-        print(f"Deleted the file: {original_file}")
+        return np.load(root_dir + "/maps/testlvl.npy"), str(root_dir + "/maps/testlvl.npy")
 
-        shutil.copy2(clone_file, original_file)
-        print(f"Cloned {clone_file} as {original_file}")
-    else:
-        print(f"The file {original_file} does not exist.")
-
-
-activemap = loadmap()
 
 max_blocks = 200
 space_blocks = 0
 filled_blocks = 0
+
 def drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point, activemap, mess_pos_array, player=None):
     max_blocks, space_blocks, filled_blocks = max_blocks, space_blocks, filled_blocks
     mess_array_fill = mess_array_fill
@@ -241,7 +230,7 @@ def drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_poi
  
 
 
-def drawgridmaker(mx, my):
+def drawgridmaker(mx, my, save=None):
     blocksize = 50
     mouse_buttons = pg.mouse.get_pressed()
     for row in range(len(activemap)):
@@ -264,6 +253,102 @@ def drawgridmaker(mx, my):
                 pg.draw.rect(WINDOW, white, rect)
             elif activemap[row][col] == 0:
                 pg.draw.rect(WINDOW, white, rect, 1)
+    if save:
+        return activemap
+
+#tkinter window that asks how you want to name your level
+def get_level_name():
+    def on_submit():
+        name = entry.get()
+        window.destroy()
+        name_var.set(name)
+
+    window = tk.Tk()
+    window.title("Enter Name")
+    
+    # get the screen width and height
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    # place window in the center of the screen
+    x = (screen_width - 150) // 2
+    y = (screen_height - 150) // 2
+
+    # set the window size and position
+    window.geometry(f"250x150+{x}+{y}")
+
+    label = tk.Label(window, text="Type level name here:")
+    label.pack()
+
+    entry = tk.Entry(window)
+    entry.pack()
+
+    button = tk.Button(window, text="Enter", command=on_submit)
+    button.pack()
+
+    name_var = tk.StringVar()
+    window.mainloop()
+
+    return name_var.get()
+
+#tkinter window that pops-up when you want to quit the mapmaker to check if you really want to quit
+def show_confirmation_popup():
+    def quit_clicked():
+        nonlocal result
+        result = True
+        window.destroy()
+
+    def cancel_clicked():
+        nonlocal result
+        result = False
+        window.destroy()
+
+    window = tk.Tk()
+    window.title("Confirmation")
+    
+    # Set the window size
+    window.geometry("200x150")
+
+    message = "Are you sure you want to quit?"
+    label = tk.Label(window, text=message)
+    label.pack(pady=20)
+
+    quit_button = tk.Button(window, text="Quit", command=quit_clicked)
+    quit_button.pack(side="left", padx=10)
+
+    cancel_button = tk.Button(window, text="Cancel", command=cancel_clicked)
+    cancel_button.pack(side="right", padx=10)
+
+    result = None
+    window.mainloop()
+
+    return result
+
+# copies the numpy array from your current level wich is the testlvl_mapmaker.npy file and pastes it into a new file that has the name you have given it
+def copy_and_paste_file(source_path, destination_path):
+    print(str(source_path))
+    try:
+        # Load the numpy array from the source file
+        source_array = np.load(str(source_path))
+        
+        # Save the numpy array to the destination file
+        np.save(str(destination_path), source_array)
+        
+        print(f"File copied and pasted successfully as: {destination_path}")
+    except FileNotFoundError:
+        print("Source file not found.")
+    except PermissionError:
+        print("Permission denied. Unable to copy and paste the file.")
+
+# save the changes you made in the mapmaker before thos get loaded in your new file
+def save_current_map(data, destination_path):
+    try:
+        # Save the numpy array to the destination file
+        np.save(destination_path, data)
+        
+        print(f"File created and saved successfully as: {destination_path}")
+    except PermissionError:
+        print("Permission denied. Unable to create and save the file.")
 
 # these 2 functions are used for rendering the texts,
 # dont ask me how because it costs me to much of my own sanity to figure out
@@ -330,6 +415,7 @@ word_spacing = 7
 start_battery = False
 turn_player_off = True
 mess_array_fill = True
+activemap, path_to_activemap = loadmap(runmapmaker)
 
 while mainmenu:
     Clock.tick(FPS)
@@ -344,11 +430,21 @@ while mainmenu:
                 a = 1
 
         if keys[pg.K_s]:
-            np.save("shootergame/maps/" + map_file_name, activemap)
+            curent_map_data = drawgridmaker(mouse[0], mouse[1], save)
+            save_current_map(curent_map_data, path_to_activemap)
+            level_name = get_level_name()
+            save_map = root_dir + "/maps/{}.npy".format(level_name)
+            copy_and_paste_file(path_to_activemap, save_map)
         if keys[pg.K_q]:
-            mainmenu = True
-            runmapmaker = False
-            delete_and_clone_file((root_dir + "/maps/testlvl.npy"),(root_dir + "/maps/testlvlbc.npy"))
+            confirmation_result = show_confirmation_popup()
+            if confirmation_result is not None:
+                if confirmation_result:
+                    save = True
+                    mainmenu = True
+                    runmapmaker = False
+                else:
+                    # does nothing, gives error when no code exists in this statement
+                    a = None
 
         if event.type == pg.QUIT:
             runmapmaker = False
@@ -496,7 +592,7 @@ while mainmenu:
             if mapmakerButton.handle_collision() and runmaps:
                 runmapmaker = True
 
-            if devlevelsButton.handle_collision() and runmaps:
+            if levelsButton.handle_collision() and runmaps:
                 a = 1
             # a menu with level appears!
 
