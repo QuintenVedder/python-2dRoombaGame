@@ -11,17 +11,16 @@ import instruction_texts as texts
 import credit_text
 
 pg.init()
-map_name = str(random.randint(0, 99999999999999))
-map_file_name = "{}".format(map_name)
 start_point = (0, 0)
 player_radius = 25
 player_color = (255, 0, 0)
 batteryX = 900
 batteryY = 400
 battery_life = 1
-speed = 1
+speed = 7
 Clock = pg.time.Clock()
-FPS = 30
+frame_count = 0
+FPS = 60
 timer = time.time()
 
 # vars for drawgrid()
@@ -62,11 +61,16 @@ on_right = pg.image.load(root_img_dir + "roomba_right.png")
 on_up = pg.image.load(root_img_dir + "roomba_up.png")
 
 # battery images img-1 is full and 5 empty
-img_battery_1 = pg.image.load(root_img_dir + "battery_1.png")
-img_battery_2 = pg.image.load(root_img_dir + "battery_2.png")
-img_battery_3 = pg.image.load(root_img_dir + "battery_3.png")
-img_battery_4 = pg.image.load(root_img_dir + "battery_4.png")
-img_battery_5 = pg.image.load(root_img_dir + "battery_5.png")
+root_img_battery_dir = root_dir + "/images/batteryframes/"
+img_battery_1_f1 = pg.image.load(root_img_battery_dir + "battery1_frame1.png")
+img_battery_2_f1 = pg.image.load(root_img_battery_dir + "battery2_frame1.png")
+img_battery_3_f1 = pg.image.load(root_img_battery_dir + "battery3_frame1.png")
+img_battery_4_f1 = pg.image.load(root_img_battery_dir + "battery4_frame1.png")
+img_battery_1_f2 = pg.image.load(root_img_battery_dir + "battery1_frame2.png")
+img_battery_2_f2 = pg.image.load(root_img_battery_dir + "battery2_frame2.png")
+img_battery_3_f2 = pg.image.load(root_img_battery_dir + "battery3_frame2.png")
+img_battery_4_f2 = pg.image.load(root_img_battery_dir + "battery4_frame2.png")
+img_battery_5 = pg.image.load(root_img_battery_dir + "battery5.png")
 
 # button images
 img_start_button = pg.image.load(root_img_dir + "start.png")
@@ -165,7 +169,7 @@ map_buttons = [backButton, mapmakerButton, levelsButton]
 player_images_on = [on_up, on_down, on_left, on_right]
 player_images_off = [off_up, off_down, off_left, off_right]
 player_images = player_images_on
-battery_images = [img_battery_1, img_battery_2, img_battery_3, img_battery_4, img_battery_5]
+battery_images = [img_battery_1_f1, img_battery_1_f2, img_battery_2_f1, img_battery_2_f2, img_battery_3_f1, img_battery_3_f2, img_battery_4_f1, img_battery_4_f2, img_battery_5]
 
 instruction_texts_array = [
     [texts.play, img_play_button],
@@ -180,9 +184,7 @@ credits_text = credit_text.credits
 
 
 def loadmap(runmapmaker):
-    if os.path.exists(root_dir + "maps" + map_file_name + ".npy"):
-        return np.load(root_dir + "maps" + map_file_name + ".npy"), str(root_dir + "maps" + map_file_name + ".npy")
-    elif runmapmaker:
+    if runmapmaker:
         return np.load(root_dir + "/maps/testlvl_mapmaker.npy"), str(root_dir + "/maps/testlvl_mapmaker.npy")
     else:
         return np.load(root_dir + "/maps/testlvl.npy"), str(root_dir + "/maps/testlvl.npy")
@@ -416,6 +418,7 @@ start_battery = False
 turn_player_off = True
 mess_array_fill = True
 activemap, path_to_activemap = loadmap(runmapmaker)
+battery_turn = False
 
 while mainmenu:
     Clock.tick(FPS)
@@ -454,6 +457,7 @@ while mainmenu:
         pg.display.flip()
 
     while runplay:
+        Clock.tick(FPS)
         WINDOW.fill((white))
         WINDOW.blit(img_background, (0, 0))
         keys = pg.key.get_pressed()
@@ -492,7 +496,9 @@ while mainmenu:
             battery_timer = time.time()
 
         if start_battery:
-            battery.battery_life(battery_life)
+            if frame_count % 30 == 0:
+                battery_turn = not battery_turn
+                battery.battery_life(battery_life, battery_turn)
             battery.draw()
 
         if keys[pg.K_q]:
@@ -507,7 +513,7 @@ while mainmenu:
 
         if event.type == pg.QUIT:
             pg.quit()
-
+        frame_count += 1
         pg.display.flip()
 
     while instructions:

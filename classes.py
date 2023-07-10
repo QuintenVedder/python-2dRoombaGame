@@ -116,21 +116,41 @@ class Battery:
         self.WINDOW = WINDOW
         self.images = battery_images
         self.active_image = self.images[0]
+        self.battery_1 = [battery_images[0], battery_images[1]]
+        self.battery_2 = [battery_images[2], battery_images[3]]
+        self.battery_3 = [battery_images[4], battery_images[5]]
+        self.battery_4 = [battery_images[6], battery_images[7]]
+        self.battery_5 = battery_images[8]
+        self.facing = None
 
-    def battery_life(self, battery_life):
+    def battery_life(self, battery_life, turn):
+        self.turn = turn
         if battery_life == 1:
-            self.facing = self.images[0]
+            if turn == False:
+                self.facing = self.battery_1[0]
+            else:
+                self.facing = self.battery_1[1]
         elif battery_life == 2:
-            self.facing = self.images[1]
+            if turn == False:
+                self.facing = self.battery_2[0]
+            else:
+                self.facing = self.battery_2[1]
         elif battery_life == 3:
-            self.facing = self.images[2]
+            if turn == False:
+                self.facing = self.battery_3[0]
+            else:
+                self.facing = self.battery_3[1]
         elif battery_life == 4:
-            self.facing = self.images[3]
+            if turn == False:
+                self.facing = self.battery_4[0]
+            else:
+                self.facing = self.battery_4[1]
         elif battery_life == 5:
-            self.facing = self.images[4]
+            self.facing = self.battery_5
 
     def draw(self):
-        self.WINDOW.blit(self.facing, (self.x, self.y))
+        if self.facing:
+            self.WINDOW.blit(self.facing, (self.x, self.y))
 
 class Mess:
     def __init__(self, array, WINDOW, mess_images):
