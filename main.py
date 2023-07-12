@@ -17,7 +17,7 @@ player_color = (255, 0, 0)
 batteryX = 900
 batteryY = 400
 battery_life = 1
-speed = 7
+speed = 6
 Clock = pg.time.Clock()
 frame_count = 0
 FPS = 60
@@ -183,11 +183,15 @@ mess_pos_array = [
 credits_text = credit_text.credits
 
 
-def loadmap(runmapmaker):
+def loadmap(runmapmaker, selected_level=None):
+    print("loading level................")
     if runmapmaker:
         return np.load(root_dir + "/maps/testlvl_mapmaker.npy"), str(root_dir + "/maps/testlvl_mapmaker.npy")
+    elif runmapmaker == False and selected_level != None:
+        return np.load(root_dir + "/maps/"+selected_level), str(root_dir + "/maps/"+selected_level)
     else:
-        return np.load(root_dir + "/maps/testlvl.npy"), str(root_dir + "/maps/testlvl.npy")
+        print("was not able to load level. check the 'loadmap' function")
+        return np.load(root_dir + "/maps/testlvl_mapmaker.npy"), str(root_dir + "/maps/testlvl_mapmaker.npy")
 
 
 max_blocks = 200
@@ -326,6 +330,29 @@ def show_confirmation_popup():
 
     return result
 
+#tkinter window for letting the player choose the level they want to play
+def get_selected_level():
+    folder_path = os.path.dirname(os.path.abspath(__file__))
+    levels = os.listdir(folder_path + "/maps")
+
+    selected_level = None
+
+    def select_file(level_name):
+        nonlocal selected_level
+        selected_level = level_name
+        root.destroy()  # Close the Tkinter window
+
+    root = tk.Tk()
+    root.title("Levels")
+
+    for level_name in levels:
+        button = tk.Button(root, text=level_name, command=lambda name=level_name: select_file(name))
+        button.pack(padx=10, pady=5)
+
+    root.mainloop()
+
+    return selected_level
+
 # copies the numpy array from your current level wich is the testlvl_mapmaker.npy file and pastes it into a new file that has the name you have given it
 def copy_and_paste_file(source_path, destination_path):
     print(str(source_path))
@@ -433,6 +460,7 @@ while mainmenu:
                 a = 1
 
         if keys[pg.K_s]:
+            save = True
             curent_map_data = drawgridmaker(mouse[0], mouse[1], save)
             save_current_map(curent_map_data, path_to_activemap)
             level_name = get_level_name()
@@ -472,7 +500,7 @@ while mainmenu:
 
         if spawn_player == False:
             # added all vars to be returned, used to be only start_point. apperently this works and mess_array_fill is now finally False
-            space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point,  activemap, mess_pos_array, player)
+            space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point,  selected_level, mess_pos_array, player)
 
             if battery_life < 5:
                 player.move((keys[pg.K_RIGHT] - keys[pg.K_LEFT]) *
@@ -485,7 +513,7 @@ while mainmenu:
                 battery_timer = time.time()
             player.draw()
         else:
-            space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point, activemap, mess_pos_array)
+            space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point, selected_level, mess_pos_array)
 
         if mess_array_fill == False:
             first_mess = place_mess(mess_pos_array, player, first_mess)
@@ -608,6 +636,10 @@ while mainmenu:
 
             if playButton.handle_collision() and start:
                 runplay = True
+                selected_level = get_selected_level()
+                print("level found")
+                selected_level, path_to_selected_level = loadmap(runmapmaker, selected_level)
+                print("an level loaded succesfully")
             #startbutton stays here otherwise bugs might appear
             if startButton.handle_collision():
                 start = True
