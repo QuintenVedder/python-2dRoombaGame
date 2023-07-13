@@ -234,7 +234,39 @@ def drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_poi
 
     return space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill
  
+def drawgridlevels(max_blocks, space_blocks, filled_blocks, activemap):
+    max_blocks, space_blocks, filled_blocks = max_blocks, space_blocks, filled_blocks
+    blocksize = 50
+    array = activemap
+    for row in range(len(array)):
+        for col in range(len(array[row])):
+            x = col * blocksize
+            y = row * blocksize
+            block = Block(x, y, blocksize, blocksize, WINDOW)
+            if array[row][col] == 1:
+                if max_blocks > (filled_blocks + space_blocks):
+                    filled_blocks += 1
+                block.draw(black)
+                block_alphasurface = pg.Surface((blocksize, blocksize), pg.SRCALPHA)
+                pg.draw.rect(block_alphasurface, aplha_black, block_alphasurface.get_rect())
+                WINDOW.blit(block_alphasurface, (x, y+25))
 
+            if array[row][col] == 2 and start_point == (0, 0):
+                # zet hier spawnpoint
+                if max_blocks > (filled_blocks + space_blocks):
+                        mess_pos_array.append([x, y])
+                        space_blocks += 1
+                elif max_blocks == (filled_blocks + space_blocks):
+                    mess_array_fill = False
+                
+            if array[row][col] == 0 or array[row][col] == 2:
+                    if max_blocks > (filled_blocks + space_blocks):
+                        mess_pos_array.append([x, y])
+                        space_blocks += 1
+                    elif max_blocks == (filled_blocks + space_blocks):
+                        mess_array_fill = False
+
+    return space_blocks, filled_blocks
 
 def drawgridmaker(mx, my, save=None):
     blocksize = 50
@@ -426,6 +458,17 @@ def place_mess(mess_pos_array, player, first_mess):
 
     mess.draw()
     return first_mess
+
+def get_npy_files():
+    directory = 'maps'
+    npy_files = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".npy"):
+                npy_files.append(os.path.join(root, file))
+    print("The files found are:", npy_files)
+    return npy_files
+
     
 runmaps = False
 runmapmaker = False
@@ -446,6 +489,10 @@ turn_player_off = True
 mess_array_fill = True
 activemap, path_to_activemap = loadmap(runmapmaker)
 battery_turn = False
+levels = False
+fetchlevels = True
+activelevel = 0
+maxlevel = 0
 
 while mainmenu:
     Clock.tick(FPS)
@@ -490,8 +537,7 @@ while mainmenu:
         WINDOW.blit(img_background, (0, 0))
         keys = pg.key.get_pressed()
         if spawn_player and start_point != (0, 0):
-            player = Player("player", start_point[0], start_point[1], player_radius,
-                            player_color, WINDOW, player_images_off, player_images_on)
+            player = Player("player", start_point[0], start_point[1], player_radius,player_color, WINDOW, player_images_off, player_images_on)
             battery = Battery(batteryX, batteryY, WINDOW, battery_images)
             spawn_player = False
             battery_life = 1
@@ -543,6 +589,48 @@ while mainmenu:
             pg.quit()
         frame_count += 1
         pg.display.flip()
+
+    while levels:
+        if(fetchlevels):
+            list_of_levels = get_npy_files()
+            maxlevel = len(list_of_levels)
+            space_blocks, filled_blocks = drawgridlevels(max_blocks, space_blocks, filled_blocks, list_of_levels[activelevel])
+            fetchlevels = False
+        else:
+            WINDOW.blit(img_background, (0, 0))
+            mouse = pg.mouse.get_pos()
+            keys = pg.key.get_pressed()
+
+            for event in pg.event.get():
+
+                if event.type == pg.QUIT:
+                    pg.quit()
+
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if arrow_rightButton.handle_collision():
+                        if activelevel == maxlevel-1:
+                            activelevel = 0
+                        else: 
+                            activelevel += 1
+                        space_blocks, filled_blocks = drawgridlevels(max_blocks, space_blocks, filled_blocks, list_of_levels[activelevel])
+
+                    if arrow_leftButton.handle_collision():
+                        if activelevel == 0:
+                            activelevel = maxlevel-1
+                        else: 
+                            activelevel -= 1
+                        space_blocks, filled_blocks = drawgridlevels(max_blocks, space_blocks, filled_blocks, list_of_levels[activelevel])
+
+            for arrow in arrows:
+                arrow.handle_collision()
+                arrow.draw()
+                
+
+            if keys[pg.K_q] or event.type == pg.QUIT:
+                levels = False
+            else:
+                print(activelevel, maxlevel,list_of_levels,list_of_levels[activelevel])
+                pg.display.flip()
 
     while instructions:
         WINDOW.blit(img_background, (0, 0))
@@ -622,13 +710,12 @@ while mainmenu:
             if backButton.handle_collision() and runmaps:
                 runmaps = False
                 start = True
-
+                
             if mapmakerButton.handle_collision() and runmaps:
                 runmapmaker = True
 
             if levelsButton.handle_collision() and runmaps:
-                a = 1
-            # a menu with level appears!
+                levels = True
 
             if mapsButton.handle_collision() and start:
                 runmaps = True
