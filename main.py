@@ -188,7 +188,8 @@ def loadmap(runmapmaker, selected_level=None):
     if runmapmaker:
         return np.load(root_dir + "/maps/testlvl_mapmaker.npy"), str(root_dir + "/maps/testlvl_mapmaker.npy")
     elif runmapmaker == False and selected_level != None:
-        return np.load(root_dir + "/maps/"+selected_level), str(root_dir + "/maps/"+selected_level)
+        print('loading custom file.....')
+        return np.load(root_dir + "/maps/CustomMaps/"+selected_level), str(root_dir + "/maps/CustomMaps/"+selected_level)
     else:
         print("was not able to load level. check the 'loadmap' function")
         return np.load(root_dir + "/maps/testlvl_mapmaker.npy"), str(root_dir + "/maps/testlvl_mapmaker.npy")
@@ -234,6 +235,27 @@ def drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_poi
 
     return space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill
  
+def drawgridlevels(max_blocks, space_blocks, filled_blocks, activemap):
+    max_blocks, space_blocks, filled_blocks = max_blocks, space_blocks, filled_blocks
+    blocksize = 50
+    array = activemap
+
+    for row in range(len(array)):
+        for col in range(len(array[row])):
+            x = col * blocksize
+            y = row * blocksize
+            block = Block(x, y, blocksize, blocksize, WINDOW)
+            if int(array[row, col] == 1):
+                if max_blocks > (filled_blocks + space_blocks):
+                    filled_blocks += 1
+                block.draw(black)
+                block_alphasurface = pg.Surface((blocksize, blocksize), pg.SRCALPHA)
+                pg.draw.rect(block_alphasurface, aplha_black, block_alphasurface.get_rect())
+                WINDOW.blit(block_alphasurface, (x, y+25))
+
+            if int(array[row, col] == 2):
+                #checks for startpos
+                blocksize = 50
 
 
 def drawgridmaker(mx, my, save=None):
@@ -426,7 +448,18 @@ def place_mess(mess_pos_array, player, first_mess):
 
     mess.draw()
     return first_mess
-    
+
+def get_npy_files():
+    directory = 'maps/CustomMaps'
+    npy_files = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".npy"):
+                if file != "testlvl.npy" or file != "testlvl_mapmaker.npy":
+                    npy_files.append(file)
+    return npy_files
+
+running = True
 runmaps = False
 runmapmaker = False
 runplay = False
@@ -446,9 +479,14 @@ turn_player_off = True
 mess_array_fill = True
 activemap, path_to_activemap = loadmap(runmapmaker)
 battery_turn = False
+levels = False
+fetchlevels = True
+activelevel = 0
+maxlevel = 0
+activelevelarray = []
+activelevelarray_path = ""
 
-while mainmenu:
-    Clock.tick(FPS)
+while running:
     while runmapmaker:
         keys = pg.key.get_pressed()
         WINDOW.fill((black))
@@ -464,21 +502,22 @@ while mainmenu:
             curent_map_data = drawgridmaker(mouse[0], mouse[1], save)
             save_current_map(curent_map_data, path_to_activemap)
             level_name = get_level_name()
-            save_map = root_dir + "/maps/{}.npy".format(level_name)
+            save_map = root_dir + "/maps/CustomMaps/{}.npy".format(level_name)
             copy_and_paste_file(path_to_activemap, save_map)
         if keys[pg.K_q]:
             confirmation_result = show_confirmation_popup()
             if confirmation_result is not None:
-                if confirmation_result:
-                    save = True
-                    mainmenu = True
+                if confirmation_result and runmapmaker == True:
                     runmapmaker = False
+                    runmaps = True
+                    save = True
                 else:
                     # does nothing, gives error when no code exists in this statement
-                    a = None
+                    print("i dunno what went wrong")
 
         if event.type == pg.QUIT:
             runmapmaker = False
+            runmaps = True
 
         savemaptext = font.render('press S to save and Q to quit', True, grey)
         WINDOW.blit(savemaptext, (0, WINDOW_HEIGHT-100))
@@ -490,8 +529,7 @@ while mainmenu:
         WINDOW.blit(img_background, (0, 0))
         keys = pg.key.get_pressed()
         if spawn_player and start_point != (0, 0):
-            player = Player("player", start_point[0], start_point[1], player_radius,
-                            player_color, WINDOW, player_images_off, player_images_on)
+            player = Player("player", start_point[0], start_point[1], player_radius,player_color, WINDOW, player_images_off, player_images_on)
             battery = Battery(batteryX, batteryY, WINDOW, battery_images)
             spawn_player = False
             battery_life = 1
@@ -544,6 +582,53 @@ while mainmenu:
         frame_count += 1
         pg.display.flip()
 
+    while levels:
+        if(fetchlevels):
+            list_of_levels = get_npy_files()
+            maxlevel = len(list_of_levels)
+            fetchlevels = False
+            activelevelarray, activelevelarray_path = loadmap(runmapmaker, list_of_levels[activelevel])
+        else:
+            WINDOW.blit(img_background, (0, 0))
+            level_texts = font.render(list_of_levels[activelevel], True, (0,0,0))
+            mouse = pg.mouse.get_pos()
+            keys = pg.key.get_pressed()
+
+            for event in pg.event.get():
+
+                if event.type == pg.QUIT:
+                    pg.quit()
+
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if arrow_rightButton.handle_collision():
+                        if activelevel == maxlevel-1:
+                            activelevel = 0
+                        else: 
+                            activelevel += 1
+                        activelevelarray, activelevelarray_path = loadmap(runmapmaker, list_of_levels[activelevel])
+
+                    if arrow_leftButton.handle_collision():
+                        if activelevel == 0:
+                            activelevel = maxlevel-1
+                        else: 
+                            activelevel -= 1
+                        activelevelarray, activelevelarray_path = loadmap(runmapmaker, list_of_levels[activelevel])
+
+            #drawgridlevels(max_blocks, space_blocks, filled_blocks, activelevelarray)
+            WINDOW.blit(level_texts, (WINDOW_WIDTH/2 - level_texts.get_width() // 2, 0 - level_texts.get_height() // 2))
+            for arrow in arrows:
+                arrow.handle_collision()
+                arrow.draw()
+                
+
+            if keys[pg.K_q] or event.type == pg.QUIT:
+                levels = False
+                runmaps = True
+                fetchlevels = True   
+            
+            print(activelevel, maxlevel,list_of_levels,list_of_levels[activelevel])
+            pg.display.flip()
+
     while instructions:
         WINDOW.blit(img_background, (0, 0))
         mouse = pg.mouse.get_pos()
@@ -566,8 +651,7 @@ while mainmenu:
                         current_text = len(instruction_texts_array)-1
                     else:
                         current_text -= 1
-        flattened_texts = flatten_text(
-            instruction_texts_array[current_text][0])
+        flattened_texts = flatten_text(instruction_texts_array[current_text][0])
         render_texts(flattened_texts, text_posX, text_posY, word_spacing)
         WINDOW.blit(instruction_texts_array[current_text][1],
                     (instructions_title_posX, instructions_title_posY))
@@ -597,72 +681,104 @@ while mainmenu:
 
         pg.display.flip()
 
-    WINDOW.fill((white))
-    WINDOW.blit(img_background, (0, 0))
-    if time.time() - timer > 1:
-        title_down = not title_down
-        if title_down:
-            title_height += 20
-        else:
-            title_height -= 20
-        timer = time.time()
+    while mainmenu:
+        Clock.tick(FPS)
+        WINDOW.fill((white))
+        WINDOW.blit(img_background, (0, 0))
+        if time.time() - timer > 1:
+            title_down = not title_down
+            if title_down:
+                title_height += 20
+            else:
+                title_height -= 20
+            timer = time.time()
 
-    WINDOW.blit(img_title, (210, title_height))
+        WINDOW.blit(img_title, (210, title_height))
 
-    for event in pg.event.get():
+        for event in pg.event.get():
 
-        if event.type == pg.QUIT:
-            pg.quit()
-
-        if event.type == pg.MOUSEBUTTONDOWN:
-
-            if quitButton.handle_collision() and start:
+            if event.type == pg.QUIT:
                 pg.quit()
 
-            if backButton.handle_collision() and runmaps:
-                runmaps = False
-                start = True
+            if event.type == pg.MOUSEBUTTONDOWN:
 
-            if mapmakerButton.handle_collision() and runmaps:
-                runmapmaker = True
+                if quitButton.handle_collision() and start:
+                    pg.quit()
 
-            if levelsButton.handle_collision() and runmaps:
-                a = 1
-            # a menu with level appears!
+                if mapsButton.handle_collision() and start:
+                    runmaps = True
+                    mainmenu = False
+                    start = False
 
-            if mapsButton.handle_collision() and start:
-                runmaps = True
-                start = False
+                if playButton.handle_collision() and start:
+                    runplay = True
+                    selected_level = get_selected_level()
+                    print("level found")
+                    selected_level, path_to_selected_level = loadmap(runmapmaker, selected_level)
+                    print("an level loaded succesfully")
+                #startbutton stays here otherwise bugs might appear
+                if startButton.handle_collision():
+                    start = True
 
-            if playButton.handle_collision() and start:
-                runplay = True
-                selected_level = get_selected_level()
-                print("level found")
-                selected_level, path_to_selected_level = loadmap(runmapmaker, selected_level)
-                print("an level loaded succesfully")
-            #startbutton stays here otherwise bugs might appear
-            if startButton.handle_collision():
-                start = True
+                if instructionsButton.handle_collision() and start:
+                    instructions = True
 
-            if instructionsButton.handle_collision() and start:
-                instructions = True
+                if creditsButton.handle_collision() and start:
+                    credits = True
 
-            if creditsButton.handle_collision() and start:
-                credits = True
+        if start == False and runmaps == False:
+            startButton.handle_collision()
+            startButton.draw()
+        if start and runmaps == False:
+            for button in buttons:
+                button.handle_collision()
+                button.draw()
 
-    if start == False and runmaps == False:
-        startButton.handle_collision()
-        startButton.draw()
-    if start and runmaps == False:
-        for button in buttons:
-            button.handle_collision()
-            button.draw()
-    if runmaps and start == False:
-        for button in map_buttons:
-            button.handle_collision()
-            button.draw()
+        mouse = pg.mouse.get_pos()
 
-    mouse = pg.mouse.get_pos()
+        # end event handling
+        pg.display.flip()
 
-    # end event handling
-    pg.display.flip()
+    while runmaps:
+        Clock.tick(FPS)
+        WINDOW.fill((white))
+        WINDOW.blit(img_background, (0, 0))
+        if time.time() - timer > 1:
+            title_down = not title_down
+            if title_down:
+                title_height += 20
+            else:
+                title_height -= 20
+            timer = time.time()
+
+        WINDOW.blit(img_title, (210, title_height))
+
+        for event in pg.event.get():
+
+            if event.type == pg.QUIT:
+                pg.quit()
+
+            if event.type == pg.MOUSEBUTTONDOWN:
+
+                if backButton.handle_collision() and runmaps:
+                    runmaps = False
+                    mainmenu = True
+                    start = True
+
+                if mapmakerButton.handle_collision() and runmaps:
+                    runmaps = False
+                    runmapmaker = True
+
+                if levelsButton.handle_collision() and runmaps:
+                    runmaps = False
+                    levels = True
+
+        if runmaps:
+            for button in map_buttons:
+                button.handle_collision()
+                button.draw()
+
+        mouse = pg.mouse.get_pos()
+
+        # end event handling
+        pg.display.flip()
