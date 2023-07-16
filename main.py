@@ -259,7 +259,7 @@ def drawgridlevels(max_blocks, space_blocks, filled_blocks, activemap):
 
 
 def drawgridmaker(mx, my, save=None):
-    print("drawing {}".format(activemap))
+    #print("drawing {}".format(activemap))
     blocksize = 50
     mouse_buttons = pg.mouse.get_pressed()
     for row in range(len(activemap)):
@@ -507,6 +507,7 @@ activelevel = 0
 maxlevel = 0
 activelevelarray = []
 activelevelarray_path = ""
+breakloop = False
 
 while running:
     while runmapmaker:
@@ -560,7 +561,6 @@ while running:
 
         if spawn_player == False:
             # added all vars to be returned, used to be only start_point. apperently this works and mess_array_fill is now finally False
-            print("attempt at running the draw function for the selected level")
             space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point,  selected_level, mess_pos_array, player)
 
             if battery_life < 5:
@@ -637,7 +637,7 @@ while running:
                             activelevel -= 1
                         activelevelarray, activelevelarray_path = loadmap(runmapmaker, list_of_levels[activelevel])
 
-            #drawgridlevels(max_blocks, space_blocks, filled_blocks, activelevelarray)
+            drawgridlevels(max_blocks, space_blocks, filled_blocks, activelevelarray)
             WINDOW.blit(level_texts, (WINDOW_WIDTH/2 - level_texts.get_width() // 2, 20 - level_texts.get_height() // 2))
             for arrow in arrows:
                 arrow.handle_collision()
@@ -649,7 +649,7 @@ while running:
                 runmaps = True
                 fetchlevels = True   
             
-            print(activelevel, maxlevel,list_of_levels,list_of_levels[activelevel])
+            #print(activelevel, maxlevel,list_of_levels,list_of_levels[activelevel])
             pg.display.flip()
 
     while instructions:
@@ -737,11 +737,13 @@ while running:
                     selected_level = get_selected_level()
                     if (selected_level == False):
                         print("closed selection window without loading level.....gameplay loop:{}".format(runplay))
-                        break
-                    else:
-                        runplay = True
+                        breakloop = True
+                        runplay = False
+                    elif (selected_level and breakloop == False):
                         print("level found")
                         selected_level, path_to_selected_level = loadmap(runmapmaker, selected_level)
+                        mainmenu = False
+                        runplay = True
                         print("an level loaded succesfully.... starting gameplay loop:{}".format(runplay))
                         
                 #startbutton stays here otherwise bugs might appear
