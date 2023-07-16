@@ -189,7 +189,7 @@ def loadmap(runmapmaker, selected_level=None):
         return np.load(root_dir + "/maps/testlvl_mapmaker.npy"), str(root_dir + "/maps/testlvl_mapmaker.npy")
     elif runmapmaker == False and selected_level != None:
         print('loading custom file.....')
-        return np.load(root_dir + "/maps/"+selected_level), str(root_dir + "/maps/"+selected_level)
+        return np.load(root_dir + "/maps/CustomMaps/"+selected_level), str(root_dir + "/maps/CustomMaps/"+selected_level)
     else:
         print("was not able to load level. check the 'loadmap' function")
         return np.load(root_dir + "/maps/testlvl_mapmaker.npy"), str(root_dir + "/maps/testlvl_mapmaker.npy")
@@ -450,12 +450,13 @@ def place_mess(mess_pos_array, player, first_mess):
     return first_mess
 
 def get_npy_files():
-    directory = 'maps'
+    directory = 'maps/CustomMaps'
     npy_files = []
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file.endswith(".npy"):
-                npy_files.append(file)
+                if file != "testlvl.npy" or file != "testlvl_mapmaker.npy":
+                    npy_files.append(file)
     return npy_files
 
 running = True
@@ -501,13 +502,12 @@ while running:
             curent_map_data = drawgridmaker(mouse[0], mouse[1], save)
             save_current_map(curent_map_data, path_to_activemap)
             level_name = get_level_name()
-            save_map = root_dir + "/maps/{}.npy".format(level_name)
+            save_map = root_dir + "/maps/CustomMaps/{}.npy".format(level_name)
             copy_and_paste_file(path_to_activemap, save_map)
         if keys[pg.K_q]:
             confirmation_result = show_confirmation_popup()
             if confirmation_result is not None:
                 if confirmation_result and runmapmaker == True:
-                    print("closing active gameloop........")
                     runmapmaker = False
                     runmaps = True
                     save = True
@@ -590,6 +590,7 @@ while running:
             activelevelarray, activelevelarray_path = loadmap(runmapmaker, list_of_levels[activelevel])
         else:
             WINDOW.blit(img_background, (0, 0))
+            level_texts = font.render(list_of_levels[activelevel], True, (0,0,0))
             mouse = pg.mouse.get_pos()
             keys = pg.key.get_pressed()
 
@@ -613,7 +614,8 @@ while running:
                             activelevel -= 1
                         activelevelarray, activelevelarray_path = loadmap(runmapmaker, list_of_levels[activelevel])
 
-            drawgridlevels(max_blocks, space_blocks, filled_blocks, activelevelarray)
+            #drawgridlevels(max_blocks, space_blocks, filled_blocks, activelevelarray)
+            WINDOW.blit(level_texts, (WINDOW_WIDTH/2 - level_texts.get_width() // 2, 0 - level_texts.get_height() // 2))
             for arrow in arrows:
                 arrow.handle_collision()
                 arrow.draw()
@@ -622,6 +624,7 @@ while running:
             if keys[pg.K_q] or event.type == pg.QUIT:
                 levels = False
                 runmaps = True
+                fetchlevels = True   
             
             print(activelevel, maxlevel,list_of_levels,list_of_levels[activelevel])
             pg.display.flip()
@@ -648,8 +651,7 @@ while running:
                         current_text = len(instruction_texts_array)-1
                     else:
                         current_text -= 1
-        flattened_texts = flatten_text(
-            instruction_texts_array[current_text][0])
+        flattened_texts = flatten_text(instruction_texts_array[current_text][0])
         render_texts(flattened_texts, text_posX, text_posY, word_spacing)
         WINDOW.blit(instruction_texts_array[current_text][1],
                     (instructions_title_posX, instructions_title_posY))
