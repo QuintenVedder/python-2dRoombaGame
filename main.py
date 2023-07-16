@@ -188,7 +188,7 @@ def loadmap(runmapmaker, selected_level=None):
     if runmapmaker:
         return np.load(root_dir + "/maps/testlvl_mapmaker.npy"), str(root_dir + "/maps/testlvl_mapmaker.npy")
     elif runmapmaker == False and selected_level != None:
-        print('loading custom file.....')
+        print('loading custom file.....{}'.format(selected_level))
         return np.load(root_dir + "/maps/CustomMaps/"+selected_level), str(root_dir + "/maps/CustomMaps/"+selected_level)
     else:
         print("was not able to load level. check the 'loadmap' function")
@@ -259,6 +259,7 @@ def drawgridlevels(max_blocks, space_blocks, filled_blocks, activemap):
 
 
 def drawgridmaker(mx, my, save=None):
+    print("drawing {}".format(activemap))
     blocksize = 50
     mouse_buttons = pg.mouse.get_pressed()
     for row in range(len(activemap)):
@@ -333,9 +334,13 @@ def show_confirmation_popup():
 
     window = tk.Tk()
     window.title("Confirmation")
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    x = (screen_width - 200) // 2
+    y = (screen_height - 150) // 2
     
     # Set the window size
-    window.geometry("200x150")
+    window.geometry(f"200x150+{x}+{y}")
 
     message = "Are you sure you want to quit?"
     label = tk.Label(window, text=message)
@@ -355,23 +360,40 @@ def show_confirmation_popup():
 #tkinter window for letting the player choose the level they want to play
 def get_selected_level():
     folder_path = os.path.dirname(os.path.abspath(__file__))
-    levels = os.listdir(folder_path + "/maps")
+    levels = os.listdir(folder_path + "/maps/CustomMaps/")
 
     selected_level = None
 
     def select_file(level_name):
+        print("a level was selected")
         nonlocal selected_level
         selected_level = level_name
-        root.destroy()  # Close the Tkinter window
+        window.destroy()
+        #return selected_level
+    
+    def on_close():
+        selected_level = False
+        print("windows closing..... ")
+        window.destroy()
+        return selected_level
 
-    root = tk.Tk()
-    root.title("Levels")
+    window = tk.Tk()
+    window.title("Levels")
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    x = (screen_width - 200) // 2
+    y = (screen_height - 150) // 2
+    
+    # Set the window size
+    window.geometry(f"200x150+{x}+{y}")
+
+    window.protocol("WM_DELETE_WINDOW", on_close)
 
     for level_name in levels:
-        button = tk.Button(root, text=level_name, command=lambda name=level_name: select_file(name))
+        button = tk.Button(window, text=level_name, command=lambda name=level_name: select_file(name))
         button.pack(padx=10, pady=5)
 
-    root.mainloop()
+    window.mainloop()
 
     return selected_level
 
@@ -538,6 +560,7 @@ while running:
 
         if spawn_player == False:
             # added all vars to be returned, used to be only start_point. apperently this works and mess_array_fill is now finally False
+            print("attempt at running the draw function for the selected level")
             space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point,  selected_level, mess_pos_array, player)
 
             if battery_life < 5:
@@ -590,7 +613,7 @@ while running:
             activelevelarray, activelevelarray_path = loadmap(runmapmaker, list_of_levels[activelevel])
         else:
             WINDOW.blit(img_background, (0, 0))
-            level_texts = font.render(list_of_levels[activelevel], True, (0,0,0))
+            level_texts = font.render(list_of_levels[activelevel], True, (255,255,255))
             mouse = pg.mouse.get_pos()
             keys = pg.key.get_pressed()
 
@@ -615,7 +638,7 @@ while running:
                         activelevelarray, activelevelarray_path = loadmap(runmapmaker, list_of_levels[activelevel])
 
             #drawgridlevels(max_blocks, space_blocks, filled_blocks, activelevelarray)
-            WINDOW.blit(level_texts, (WINDOW_WIDTH/2 - level_texts.get_width() // 2, 0 - level_texts.get_height() // 2))
+            WINDOW.blit(level_texts, (WINDOW_WIDTH/2 - level_texts.get_width() // 2, 20 - level_texts.get_height() // 2))
             for arrow in arrows:
                 arrow.handle_collision()
                 arrow.draw()
@@ -711,11 +734,16 @@ while running:
                     start = False
 
                 if playButton.handle_collision() and start:
-                    runplay = True
                     selected_level = get_selected_level()
-                    print("level found")
-                    selected_level, path_to_selected_level = loadmap(runmapmaker, selected_level)
-                    print("an level loaded succesfully")
+                    if (selected_level == False):
+                        print("closed selection window without loading level.....gameplay loop:{}".format(runplay))
+                        break
+                    else:
+                        runplay = True
+                        print("level found")
+                        selected_level, path_to_selected_level = loadmap(runmapmaker, selected_level)
+                        print("an level loaded succesfully.... starting gameplay loop:{}".format(runplay))
+                        
                 #startbutton stays here otherwise bugs might appear
                 if startButton.handle_collision():
                     start = True
