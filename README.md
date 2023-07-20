@@ -20,5 +20,6 @@ currently working on:
 1. start location becoms a charger so you could recharge the battery
 2. saving and loading maps + better ui(almost done)
 3. power-ups maybe
+4. NONE OF THE ABOVE! i found a shit load of bugs and now i am trying to digest my own spaghetti code but my brain is slowly imploding in on itself
 
 
