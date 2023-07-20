@@ -9,9 +9,10 @@ import os
 from classes import Player, Block, Button, Battery, Mess
 import instruction_texts as texts
 import credit_text
+import re
 
 pg.init()
-start_point = (0, 0)
+start_point = None
 player_radius = 25
 player_color = (255, 0, 0)
 batteryX = 900
@@ -198,6 +199,17 @@ def loadmap(runmapmaker, selected_level=None):
 max_blocks = 200
 space_blocks = 0
 filled_blocks = 0
+def get_start_point(start_point, activemap):
+    start_point = start_point
+    array = activemap
+    blocksize = 50
+    for row in range(len(array)):
+        for col in range(len(array[row])):
+            x = col * blocksize
+            y = row * blocksize
+            if array[row][col] == 2 and start_point == None:
+                start_point = (x-(blocksize/2)+50, y-(blocksize/2)+50)
+    return start_point
 
 def drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point, activemap, mess_pos_array, player=None):
     max_blocks, space_blocks, filled_blocks = max_blocks, space_blocks, filled_blocks
@@ -233,7 +245,7 @@ def drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_poi
                     elif max_blocks == (filled_blocks + space_blocks):
                         mess_array_fill = False
 
-    return space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill
+    return space_blocks, filled_blocks, mess_pos_array, mess_array_fill
  
 def drawgridlevels(max_blocks, space_blocks, filled_blocks, activemap):
     max_blocks, space_blocks, filled_blocks = max_blocks, space_blocks, filled_blocks
@@ -287,10 +299,19 @@ def drawgridmaker(mx, my, save=None):
 
 #tkinter window that asks how you want to name your level
 def get_level_name():
+    global getlevelloop
+    getlevelloop = True
+    
     def on_submit():
         name = entry.get()
         window.destroy()
         name_var.set(name)
+        
+    def on_exit():
+        global getlevelloop
+        getlevelloop = False
+        print("You chose not to save your level")
+        window.destroy()
 
     window = tk.Tk()
     window.title("Enter Name")
@@ -306,7 +327,7 @@ def get_level_name():
     # set the window size and position
     window.geometry(f"250x150+{x}+{y}")
 
-    label = tk.Label(window, text="Type level name here:")
+    label = tk.Label(window, text="Type level name here(must contain alphabetic characters):")
     label.pack()
 
     entry = tk.Entry(window)
@@ -315,10 +336,18 @@ def get_level_name():
     button = tk.Button(window, text="Enter", command=on_submit)
     button.pack()
 
+    quit_button = tk.Button(window, text="Quit", command=on_exit)
+    quit_button.pack()
+
     name_var = tk.StringVar()
     window.mainloop()
 
-    return name_var.get()
+    # Check if the string contains any alphabetic characters (a-z or A-Z)
+    if re.search('[a-zA-Z]', name_var.get()):
+        getlevelloop = False
+        return name_var.get()
+    elif getlevelloop:
+        print("The string does not contain any alphabetic characters.")
 
 #tkinter window that pops-up when you want to quit the mapmaker to check if you really want to quit
 def show_confirmation_popup():
@@ -525,8 +554,9 @@ while running:
             curent_map_data = drawgridmaker(mouse[0], mouse[1], save)
             save_current_map(curent_map_data, path_to_activemap)
             level_name = get_level_name()
-            save_map = root_dir + "/maps/CustomMaps/{}.npy".format(level_name)
-            copy_and_paste_file(path_to_activemap, save_map)
+            if level_name:
+                save_map = root_dir + "/maps/CustomMaps/{}.npy".format(level_name)
+                copy_and_paste_file(path_to_activemap, save_map)
         if keys[pg.K_q]:
             confirmation_result = show_confirmation_popup()
             if confirmation_result is not None:
@@ -551,32 +581,37 @@ while running:
         WINDOW.fill((white))
         WINDOW.blit(img_background, (0, 0))
         keys = pg.key.get_pressed()
-        if spawn_player and start_point != (0, 0):
-            player = Player("player", start_point[0], start_point[1], player_radius,player_color, WINDOW, player_images_off, player_images_on)
-            battery = Battery(batteryX, batteryY, WINDOW, battery_images)
-            spawn_player = False
-            battery_life = 1
-            battery_timer = time.time()
-            start_battery = True
+        if spawn_player:
+            start_point = get_start_point(start_point, selected_level)
+            if start_point != None:
+                turn_player_off = True
+                player = Player("player", start_point[0], start_point[1], player_radius,player_color, WINDOW, player_images_off, player_images_on)
+                battery = Battery(batteryX, batteryY, WINDOW, battery_images)
+                spawn_player = False
+                battery_life = 1
+                battery_timer = time.time()
+                start_battery = True
 
         if spawn_player == False:
             # added all vars to be returned, used to be only start_point. apperently this works and mess_array_fill is now finally False
-            space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point,  selected_level, mess_pos_array, player)
+            space_blocks, filled_blocks, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point,  selected_level, mess_pos_array, player)
 
             if battery_life < 5:
                 player.move((keys[pg.K_RIGHT] - keys[pg.K_LEFT]) *
                             speed, (keys[pg.K_DOWN] - keys[pg.K_UP]) * speed)
             else:
                 if turn_player_off:
-                    player.change_color()
+                    player.turn_off()
                     player.draw()
                     turn_player_off = False
                 battery_timer = time.time()
             player.draw()
         else:
+            print(mess_array_fill)
             space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point, selected_level, mess_pos_array)
 
         if mess_array_fill == False:
+            print(mess_array_fill)
             first_mess = place_mess(mess_pos_array, player, first_mess)
 
 
@@ -591,10 +626,16 @@ while running:
             battery.draw()
 
         if keys[pg.K_q]:
+            print("vol", mess_pos_array)
+            mess_pos_array = []
+            print("leeg", mess_pos_array)
+            mess_array_fill = True
+            start_point = None
             battery_timer = time.time()
             battery_life = 1
             mainmenu = True
             runplay = False
+            spawn_player = True
 
         for event in pg.event.get():
             if event.type == pg.KEYDOWN:

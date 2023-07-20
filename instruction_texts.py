@@ -1,5 +1,5 @@
 maps = [
-    'in MAPS you are able to make you own level by clicking the mouse buttons.',
+    'in the MAPMAKER you are able to make you own level by clicking the mouse buttons.',
     'left-click = build wall, right-click = delete wall,',
     'scrollwheel-click = starting point.',
     'if more then 1 starting points are placed',
@@ -7,7 +7,8 @@ maps = [
     'do not forget to place walls around the sides of your house',
     'otherwise the roomba might try to escape',
     'click the s key to save and the q key to quit,',
-    'you may need to click a few times because the code written for this game sucks' 
+    'keep in mind: you may need to click a few times because the code written for this game sucks.',
+    'the issue in the previous sentence was fixed but the code sucks even more now'
 ]
 play = [
     'in PLAY you play your selfmade level if you made one,',
@@ -17,6 +18,7 @@ play = [
     'roombas DO NOT WIN!... there lives are endless... unless YOU forgot to charge them'
 ]
 quit = [
+    'QUIT',
     'what do YOU think it does...',
     'it will probaly quit the game, only one way to find out right!'
 ]

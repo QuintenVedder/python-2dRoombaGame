@@ -38,7 +38,7 @@ class Player:
     def draw(self):
         self.WINDOW.blit(self.facing, (self.x - (self.radius), self.y - (self.radius)))
 
-    def change_color(self):
+    def turn_off(self):
         self.images = self.images_off
         self.facing = self.images[0]
         if self.currently_facing == "right":
@@ -52,7 +52,7 @@ class Player:
 
     def handle_collision(player, block):
 
-        closest_x = max(block.left, min(player.x, block.right))
+        '''closest_x = max(block.left, min(player.x, block.right))
         closest_y = max(block.top, min(player.y, block.bottom))
         distance = math.sqrt((player.x - closest_x)**2 + (player.y - closest_y)**2)
         
@@ -69,7 +69,7 @@ class Player:
                 if player.y < closest_y:
                     player.y -= overlap_y
                 else:
-                    player.y += overlap_y
+                    player.y += overlap_y'''
 
 class Block:
     def __init__(self, x, y, width, height,WINDOW):
@@ -160,7 +160,7 @@ class Mess:
         self.pos_array = array
 
     def position(self):
-        pos = random.randint(0, len(self.pos_array))
+        pos = random.randint(0, len(self.pos_array)-1)
         self.x = self.pos_array[pos][0]
         self.y = self.pos_array[pos][1]
         self.top = self.y
