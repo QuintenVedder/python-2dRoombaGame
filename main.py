@@ -271,7 +271,6 @@ def drawgridlevels(max_blocks, space_blocks, filled_blocks, activemap):
 
 
 def drawgridmaker(mx, my, save=None):
-    #print("drawing {}".format(activemap))
     blocksize = 50
     mouse_buttons = pg.mouse.get_pressed()
     for row in range(len(activemap)):
@@ -537,6 +536,7 @@ maxlevel = 0
 activelevelarray = []
 activelevelarray_path = ""
 breakloop = False
+gameround = 1
 
 while running:
     while runmapmaker:
@@ -607,11 +607,9 @@ while running:
                 battery_timer = time.time()
             player.draw()
         else:
-            print(mess_array_fill)
             space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point, selected_level, mess_pos_array)
 
         if mess_array_fill == False:
-            print(mess_array_fill)
             first_mess = place_mess(mess_pos_array, player, first_mess)
 
 
@@ -626,9 +624,9 @@ while running:
             battery.draw()
 
         if keys[pg.K_q]:
-            print("vol", mess_pos_array)
+            space_blocks = 0
+            filled_blocks = 0
             mess_pos_array = []
-            print("leeg", mess_pos_array)
             mess_array_fill = True
             start_point = None
             battery_timer = time.time()
@@ -636,6 +634,8 @@ while running:
             mainmenu = True
             runplay = False
             spawn_player = True
+            gameround += 1
+            first_mess = True
 
         for event in pg.event.get():
             if event.type == pg.KEYDOWN:
@@ -689,8 +689,6 @@ while running:
                 levels = False
                 runmaps = True
                 fetchlevels = True   
-            
-            #print(activelevel, maxlevel,list_of_levels,list_of_levels[activelevel])
             pg.display.flip()
 
     while instructions:
