@@ -107,7 +107,8 @@ img_credits_button_pressed = pg.image.load(root_img_dir + "credits_druk.png")
 img_instructions_button = pg.image.load(root_img_dir + "instructions.png")
 img_instructions_button_pressed = pg.image.load(root_img_dir + "instructions_druk.png")
 
-img_background = pg.image.load(root_img_dir + "menu_achtergrond.png")
+img_background = pg.image.load(root_img_dir + "achtergrond.png")
+img_menu_background = pg.image.load(root_img_dir + "menu_achtergrond.png")
 img_title = pg.image.load(root_img_dir + "titel.png")
 img_icon = pg.image.load(root_img_dir + "icon.png")
 img_mess = pg.image.load(root_img_dir + "dust.png")
@@ -692,7 +693,7 @@ while running:
             pg.display.flip()
 
     while instructions:
-        WINDOW.blit(img_background, (0, 0))
+        WINDOW.blit(img_menu_background, (0, 0))
         mouse = pg.mouse.get_pos()
         keys = pg.key.get_pressed()
 
@@ -727,7 +728,7 @@ while running:
         pg.display.flip()
 
     while credits:
-        WINDOW.blit(img_background, (0, 0))
+        WINDOW.blit(img_menu_background, (0, 0))
         keys = pg.key.get_pressed()
         for event in pg.event.get():
 
@@ -746,7 +747,7 @@ while running:
     while mainmenu:
         Clock.tick(FPS)
         WINDOW.fill((white))
-        WINDOW.blit(img_background, (0, 0))
+        WINDOW.blit(img_menu_background, (0, 0))
         if time.time() - timer > 1:
             title_down = not title_down
             if title_down:
@@ -811,7 +812,7 @@ while running:
     while runmaps:
         Clock.tick(FPS)
         WINDOW.fill((white))
-        WINDOW.blit(img_background, (0, 0))
+        WINDOW.blit(img_menu_background, (0, 0))
         if time.time() - timer > 1:
             title_down = not title_down
             if title_down:
