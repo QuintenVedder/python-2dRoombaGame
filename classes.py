@@ -52,7 +52,7 @@ class Player:
 
     def handle_collision(player, block):
 
-        '''closest_x = max(block.left, min(player.x, block.right))
+        closest_x = max(block.left, min(player.x, block.right))
         closest_y = max(block.top, min(player.y, block.bottom))
         distance = math.sqrt((player.x - closest_x)**2 + (player.y - closest_y)**2)
         
@@ -69,7 +69,7 @@ class Player:
                 if player.y < closest_y:
                     player.y -= overlap_y
                 else:
-                    player.y += overlap_y'''
+                    player.y += overlap_y
 
 class Block:
     def __init__(self, x, y, width, height,WINDOW):
