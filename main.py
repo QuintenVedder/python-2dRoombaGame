@@ -414,7 +414,8 @@ def get_selected_level():
     y = (screen_height - 150) // 2
     
     # Set the window size
-    window.geometry(f"200x150+{x}+{y}")
+    length = 150 + (15 * len(levels))
+    window.geometry(f"200x{length}+{x}+{y}")
 
     window.protocol("WM_DELETE_WINDOW", on_close)
 
@@ -771,7 +772,6 @@ while running:
                 if mapsButton.handle_collision() and start:
                     runmaps = True
                     mainmenu = False
-                    start = False
 
                 if playButton.handle_collision() and start:
                     selected_level = get_selected_level()
@@ -813,6 +813,7 @@ while running:
         Clock.tick(FPS)
         WINDOW.fill((white))
         WINDOW.blit(img_menu_background, (0, 0))
+        keys = pg.key.get_pressed()
         if time.time() - timer > 1:
             title_down = not title_down
             if title_down:
@@ -842,6 +843,10 @@ while running:
                 if levelsButton.handle_collision() and runmaps:
                     runmaps = False
                     levels = True
+
+            if keys[pg.K_q]:
+                mainmenu = True
+                runmaps = False
 
         if runmaps:
             for button in map_buttons:
