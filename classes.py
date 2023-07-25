@@ -186,8 +186,8 @@ class Charger:
     def __init__(self, WINDOW, pos, image):
         self.WINDOW = WINDOW  
         self.image = image
-        self.x = pos[0]
-        self.y = pos[1]
+        self.x = pos[0] - 25
+        self.y = pos[1] - 25
         self.top = self.y
         self.left = self.x
         self.bottom = self.y + 50
