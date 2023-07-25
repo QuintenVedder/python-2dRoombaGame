@@ -607,9 +607,11 @@ while running:
             else:
                 if turn_player_off:
                     player.turn_off()
+                    charger.draw()
                     player.draw()
                     turn_player_off = False
                 battery_timer = time.time()
+            charger.draw()
             player.draw()
         else:
             space_blocks, filled_blocks, start_point, mess_pos_array, mess_array_fill = drawgrid(max_blocks, space_blocks, filled_blocks, mess_array_fill, start_point, selected_level, mess_pos_array)
@@ -623,15 +625,14 @@ while running:
             battery_timer = time.time()
 
         if start_battery:
-            if frame_count % 30 == 0:
+            if frame_count % 27 == 0:
                 battery_turn = not battery_turn
                 battery.battery_life(battery_life, battery_turn)
             battery.draw()
-            charger.draw()
             charger.handle_collision(player)
             if charger.handle_collision(player) == True:
                 battery_life = 1
-                
+
         if keys[pg.K_q]:
             space_blocks = 0
             filled_blocks = 0
