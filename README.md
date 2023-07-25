@@ -9,12 +9,12 @@ and there is a .bat file, if you run this file it will install the "pygame" and 
 if windows gives a warning just open the .bat file in any text editor and copy/paste the commands in your terminal
 
 more information of the game is given in the instructions tab in the game itself, goodluck!
-![Screenshot 2023-06-12 143337](https://github.com/quintendebeste/pyhton-2dRoombaGame/assets/98585046/c604d4c1-4f04-4ddf-9e21-9eb7a500dc0e)
-![Screenshot 2023-06-12 143021](https://github.com/quintendebeste/pyhton-2dRoombaGame/assets/98585046/9738047b-8020-4040-8a4e-6e7edb930e90)
-![Screenshot 2023-06-12 142939](https://github.com/quintendebeste/pyhton-2dRoombaGame/assets/98585046/940677d9-c968-4096-83e5-cab1ebe05b05)
+![Screenshot 2023-07-25 150620](https://github.com/quintendebeste/python-2dRoombaGame/assets/98585046/4820c304-46b7-4975-88dc-fac224d39d96)
+![Screenshot 2023-07-25 150518](https://github.com/quintendebeste/python-2dRoombaGame/assets/98585046/cc9ea0dc-506f-4501-9715-f21337dcd424)
+![Screenshot 2023-07-25 150418](https://github.com/quintendebeste/python-2dRoombaGame/assets/98585046/4c33b791-10ba-4a21-99b7-b507a2193123)
 
 here's a little demo video:
-https://github.com/quintendebeste/pyhton-2dRoombaGame/assets/98585046/3e2f6489-3cce-4be2-97b1-9e199001ac11
+https://github.com/quintendebeste/python-2dRoombaGame/assets/98585046/67944f7a-ad4f-4c8e-9bd8-a880a01ffa72
 
 currently working on:
 1. start location becoms a charger so you could recharge the battery
