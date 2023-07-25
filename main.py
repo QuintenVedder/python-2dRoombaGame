@@ -6,7 +6,7 @@ import tkinter as tk
 from tkinter import messagebox
 import pygame as pg
 import os
-from classes import Player, Block, Button, Battery, Mess
+from classes import Player, Block, Button, Battery, Mess, Charger
 import instruction_texts as texts
 import credit_text
 import re
@@ -51,6 +51,8 @@ def get_current_file_path():
 # images
 root_dir = get_current_file_path()
 root_img_dir = root_dir + "/images/"
+# charger image(s)
+img_charger = pg.image.load(root_img_dir + "charger.png")
 # player movement images. i know the variable names suck, deal with it!
 off_down = pg.image.load(root_img_dir + "redroomba_down.png")
 off_left = pg.image.load(root_img_dir + "redroomba_left.png")
@@ -593,6 +595,7 @@ while running:
                 battery_life = 1
                 battery_timer = time.time()
                 start_battery = True
+                charger = Charger(WINDOW, start_point, img_charger)
 
         if spawn_player == False:
             # added all vars to be returned, used to be only start_point. apperently this works and mess_array_fill is now finally False
@@ -624,7 +627,11 @@ while running:
                 battery_turn = not battery_turn
                 battery.battery_life(battery_life, battery_turn)
             battery.draw()
-
+            charger.draw()
+            charger.handle_collision(player)
+            if charger.handle_collision(player) == True:
+                battery_life = 1
+                
         if keys[pg.K_q]:
             space_blocks = 0
             filled_blocks = 0
@@ -792,9 +799,11 @@ while running:
 
                 if instructionsButton.handle_collision() and start:
                     instructions = True
+                    mainmenu = False
 
                 if creditsButton.handle_collision() and start:
                     credits = True
+                    mainmenu = False
 
         if start == False and runmaps == False:
             startButton.handle_collision()

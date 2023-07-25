@@ -174,9 +174,31 @@ class Mess:
         self.WINDOW.blit(self.image, (self.x, self.y))
 
     def handle_collision(mess, player):
-
         closest_x = max(mess.left, min(player.x, mess.right))
         closest_y = max(mess.top, min(player.y, mess.bottom))
+        distance = math.sqrt((player.x - closest_x)**2 + (player.y - closest_y)**2)
+        
+        if distance < player.radius:
+            return True
+        return False
+    
+class Charger:
+    def __init__(self, WINDOW, pos, image):
+        self.WINDOW = WINDOW  
+        self.image = image
+        self.x = pos[0]
+        self.y = pos[1]
+        self.top = self.y
+        self.left = self.x
+        self.bottom = self.y + 50
+        self.right = self.x + 50
+
+    def draw(self):
+        self.WINDOW.blit(self.image, (self.x, self.y))
+
+    def handle_collision(charger, player):
+        closest_x = max(charger.left, min(player.x, charger.right))
+        closest_y = max(charger.top, min(player.y, charger.bottom))
         distance = math.sqrt((player.x - closest_x)**2 + (player.y - closest_y)**2)
         
         if distance < player.radius:
