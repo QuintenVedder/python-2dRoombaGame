@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import messagebox
 import pygame as pg
 import os
+import sys
 from classes import Player, Block, Button, Battery, Mess, Charger
 import instruction_texts as texts
 import credit_text
@@ -42,10 +43,12 @@ pg.display.set_caption('Sweeping Shenanigans')
 
 
 def get_current_file_path():
-    current_file = __file__
-    parent_directory = os.path.abspath(os.path.join(current_file, os.pardir))
-    parent_directory = parent_directory.replace(os.path.sep, '/')
-    return parent_directory
+    if getattr(sys, 'frozen', False):
+        # If running as a PyInstaller executable
+        return os.path.dirname(sys.executable)
+    else:
+        # If running as a script
+        return os.path.dirname(os.path.abspath(__file__))
 
 
 # images
@@ -82,14 +85,14 @@ img_start_button_pressed = pg.image.load(root_img_dir + "start_druk.png")
 img_maps_button = pg.image.load(root_img_dir + "maps.png")
 img_maps_button_pressed = pg.image.load(root_img_dir + "maps_druk.png")
 
-img_mapmaker_button = pg.image.load(root_img_dir + "placeholder.png")
-img_mapmaker_button_pressed = pg.image.load(root_img_dir + "placeholder.png")
+img_mapmaker_button = pg.image.load(root_img_dir + "mapmaker.png")
+img_mapmaker_button_pressed = pg.image.load(root_img_dir + "mapmaker_druk.png")
 
-img_levels_button = pg.image.load(root_img_dir + "placeholder.png")
-img_levels_button_pressed = pg.image.load(root_img_dir + "placeholder.png")
+img_levels_button = pg.image.load(root_img_dir + "levels.png")
+img_levels_button_pressed = pg.image.load(root_img_dir + "levels_druk.png")
 
-img_back_button = pg.image.load(root_img_dir + "placeholder.png")
-img_back_button_pressed = pg.image.load(root_img_dir + "placeholder.png")
+img_back_button = pg.image.load(root_img_dir + "back.png")
+img_back_button_pressed = pg.image.load(root_img_dir + "back_druk.png")
 
 img_quit_button = pg.image.load(root_img_dir + "quit.png")
 img_quit_button_pressed = pg.image.load(root_img_dir + "quit_druk.png")
@@ -390,7 +393,7 @@ def show_confirmation_popup():
 
 #tkinter window for letting the player choose the level they want to play
 def get_selected_level():
-    folder_path = os.path.dirname(os.path.abspath(__file__))
+    folder_path = get_current_file_path()
     levels = os.listdir(folder_path + "/maps/CustomMaps/")
 
     selected_level = None
