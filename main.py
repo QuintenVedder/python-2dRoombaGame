@@ -564,7 +564,7 @@ while running:
             if level_name:
                 save_map = root_dir + "/maps/CustomMaps/{}.npy".format(level_name)
                 copy_and_paste_file(path_to_activemap, save_map)
-        if keys[pg.K_q]:
+        if keys[pg.K_ESCAPE]:
             confirmation_result = show_confirmation_popup()
             if confirmation_result is not None:
                 if confirmation_result and runmapmaker == True:
@@ -579,7 +579,7 @@ while running:
             runmapmaker = False
             runmaps = True
 
-        savemaptext = font.render('press S to save and Q to quit', True, grey)
+        savemaptext = font.render('press S to save and ESC to quit', True, grey)
         WINDOW.blit(savemaptext, (0, WINDOW_HEIGHT-100))
         pg.display.flip()
 
@@ -636,7 +636,7 @@ while running:
             if charger.handle_collision(player) == True:
                 battery_life = 1
 
-        if keys[pg.K_q]:
+        if keys[pg.K_ESCAPE]:
             space_blocks = 0
             filled_blocks = 0
             mess_pos_array = []
@@ -698,7 +698,7 @@ while running:
                 arrow.draw()
                 
 
-            if keys[pg.K_q] or event.type == pg.QUIT:
+            if keys[pg.K_ESCAPE] or event.type == pg.QUIT:
                 levels = False
                 runmaps = True
                 fetchlevels = True   
@@ -734,7 +734,7 @@ while running:
             arrow.handle_collision()
             arrow.draw()
 
-        if keys[pg.K_q] or event.type == pg.QUIT:
+        if keys[pg.K_ESCAPE] or event.type == pg.QUIT:
             mainmenu = True
             instructions = False
         pg.display.flip()
@@ -750,7 +750,7 @@ while running:
         flattened_texts = flatten_text(credits_text)
         render_texts(flattened_texts, text_posX, text_posY-100, word_spacing)
 
-        if keys[pg.K_q]:
+        if keys[pg.K_ESCAPE]:
             mainmenu = True
             credits = False
 
@@ -857,7 +857,7 @@ while running:
                     runmaps = False
                     levels = True
 
-            if keys[pg.K_q]:
+            if keys[pg.K_ESCAPE]:
                 mainmenu = True
                 runmaps = False
 

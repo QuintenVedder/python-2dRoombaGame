@@ -7,6 +7,6 @@ credits = [
     '',
     '-------------sources of "inspiration"-------------------------------------------------',
     'pygame.org for basic pygame stuff',
-    'https://www.wikihow.com/Stay-Sane Quinten used this to not lose his sanity while writing the most unreadable spaghetti code possible',
+    'https://www.wikihow.com/Stay-Sane Quinten used this to not lose his sanity while coding',
     'paint.net and pixilart for the designs'
 ]
